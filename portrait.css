@@ -1,0 +1,73 @@
+.portrait-link {
+  position: fixed;
+  right: clamp(1rem, 3vw, 3rem);
+  bottom: clamp(1rem, 3vw, 3rem);
+  width: clamp(7rem, 14vw, 13rem);
+  line-height: 0;
+  opacity: 0.84;
+  transition: opacity 160ms ease, transform 180ms ease;
+}
+
+.portrait-link::after {
+  position: absolute;
+  top: 15%;
+  left: 30%;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 8%, rgba(255, 255, 255, 0.72) 22%, transparent 70%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.portrait-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.portrait-link:hover,
+.portrait-link:focus-visible {
+  opacity: 1;
+  transform: rotate(-2deg);
+}
+
+.portrait-link:hover::after,
+.portrait-link:focus-visible::after {
+  animation: camera-flash 420ms ease-out;
+}
+
+.portrait-link:focus-visible {
+  outline: 1px solid #f5ba17;
+  outline-offset: 0.45rem;
+}
+
+@keyframes camera-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  18% {
+    opacity: 1;
+    transform: scale(1.65);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-link {
+    transition: none;
+  }
+
+  .portrait-link:hover::after,
+  .portrait-link:focus-visible::after {
+    animation: none;
+    opacity: 0.8;
+  }
+}
