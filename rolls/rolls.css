@@ -1,0 +1,145 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap");
+
+:root {
+  color: #171712;
+  background: #f5f2e9;
+  font-family: "DM Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; }
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem clamp(1.25rem, 4vw, 4rem);
+  font-size: .72rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.site-header p { margin: 0; }
+
+.header-controls { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2.5rem); }
+
+.presentation-control {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.presentation-control:hover,
+.presentation-control:focus-visible { text-decoration: underline; }
+
+.density-control {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .62rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.density-control input {
+  width: 5.5rem;
+  accent-color: #171712;
+  cursor: ew-resize;
+}
+
+.home-link { color: inherit; text-decoration: none; }
+.home-link:hover { text-decoration: underline; }
+
+main { padding: 2rem clamp(1.25rem, 4vw, 4rem) 5rem; }
+
+.intro { max-width: 50rem; margin: 4vw 0 clamp(3rem, 8vw, 7rem); }
+.eyebrow { margin: 0 0 1rem; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+h1 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(5rem, 17vw, 15rem);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -.08em;
+  line-height: .72;
+}
+.lede { margin: 2rem 0 0; font-size: clamp(.88rem, 1.4vw, 1rem); line-height: 1.7; }
+
+.gallery {
+  width: 100%;
+}
+
+.gallery-row {
+  display: flex;
+  width: 100%;
+  gap: .45rem;
+  margin-bottom: .45rem;
+}
+
+.photo {
+  appearance: none;
+  position: relative;
+  display: block;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: .7rem;
+  background: #dfd9ca;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo:focus-visible { outline: 2px solid #171712; outline-offset: 3px; }
+
+.gallery-sentinel { min-height: 4rem; padding: 2rem 0; font-size: .7rem; letter-spacing: .07em; text-align: center; text-transform: uppercase; }
+.gallery-sentinel[hidden] { display: none; }
+
+.lightbox {
+  width: min(96vw, 90rem);
+  max-width: none;
+  max-height: 94vh;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.lightbox::backdrop { background: rgb(8 8 6 / .92); backdrop-filter: blur(5px); }
+.lightbox img { display: block; max-width: 96vw; max-height: 90vh; margin: auto; object-fit: contain; }
+.lightbox-close {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font: 2rem/1 sans-serif;
+}
+
+@media (max-width: 720px) {
+  .gallery-row { gap: .3rem; margin-bottom: .3rem; }
+  .photo { border-radius: .45rem; }
+  .intro { margin-top: 12vw; }
+  .density-control span { display: none; }
+  .density-control input { width: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) { .photo img { transition: none; } }
