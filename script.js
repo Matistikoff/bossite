@@ -1,7 +1,7 @@
 const typingText = document.querySelector("#typing-text");
 // Keep "mito.boss" first; all following entries display in a random order.
 // Use "{time}" or "{day}" for live values.
-const messages = ["mito.boss", "{time}", "liubov", "<3", "vim" , "zuberec", "fei" , "hasicky zbor", "x230", "air frajer", "{days}", "gitara", "koniferka", "mamka", "skateboard", "pivo", "minolta", "kino", "box", "unity", "java", "angular", "Linux", "Bono", "jak blazen", "heft", "breaking bad", "maind", "kratom", "csgo", "casio", "ween", "sennheiser", "gramofon", "cigo bigo", "zatim", "tutac", "sprcha", "budafinska"];
+const messages = ["mito.boss", "{time}", "liubov", "<3", "vim" , "zuberec", "fei" , "hasicky zbor", "x230", "air frajer", "{days}", "gitara", "koniferka", "mamka", "skateboard", "pivo", "minolta", "kino", "box", "unity", "java", "angular", "Linux", "Bono", "jak blazen", "heft", "breaking bad", "maind", "kratom", "csgo", "casio", "ween", "sennheiser", "gramofon", "cigo bigo", "zatim", "tutac", "sprcha", "budafinska", "kolacik", "kaloria", "skyn", "kamianka buzka", "dzem", "leclerc", "lienka", "misovica", "PhD.", "Ing.", "C2/32"];
 const typeDelay = 120;
 const deleteDelay = 70;
 const pauseDelay = 1200;

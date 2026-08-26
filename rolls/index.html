@@ -6,18 +6,22 @@
     <meta name="theme-color" content="#10100e" />
     <title>Rolls — mito.boss</title>
     <link rel="stylesheet" href="./rolls.css" />
+    <script src="./data.js" defer></script>
     <script src="./rolls.js" defer></script>
   </head>
   <body>
     <header class="site-header">
       <a class="home-link" href="../index.html">mito.boss</a>
       <div class="header-controls">
-        <button id="presentation" class="presentation-control" type="button" aria-pressed="false">present</button>
         <label class="density-control" for="density">
           <span>density</span>
           <input id="density" type="range" min="0" max="100" value="50" />
         </label>
-        <p>rolls <span id="photo-count"></span></p>
+        <div class="archive-stats" aria-label="Archive statistics">
+          <p>rolls <span id="roll-count"></span></p>
+          <p>shutters <span id="shutter-count"></span></p>
+          <p>cost <span id="film-cost"></span></p>
+        </div>
       </div>
     </header>
 
@@ -25,7 +29,14 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">a little archive</p>
         <h1 id="page-title">Mito.Rolls</h1>
-        <p class="lede">Small moments, kept on film-ish pixels.</p>
+        <p class="lede">Small moments, kept on film-ish pixels. Browse the newest rolls, or find a subject.</p>
+        <div class="archive-controls" aria-label="Gallery filters">
+          <div class="browse-modes" role="tablist" aria-label="Browse photos by">
+            <button class="mode-button is-active" type="button" role="tab" aria-selected="true" data-mode="rolls">New / rolls</button>
+            <button class="mode-button" type="button" role="tab" aria-selected="false" data-mode="subjects">Subjects</button>
+          </div>
+          <div id="filter-options" class="filter-options" aria-label="Available filters"></div>
+        </div>
       </section>
 
       <section id="gallery" class="gallery" aria-label="Photo gallery"></section>
@@ -34,9 +45,29 @@
       </div>
     </main>
 
-    <dialog id="lightbox" class="lightbox" aria-label="Photo viewer">
-      <button class="lightbox-close" type="button" aria-label="Close photo viewer">×</button>
-      <img id="lightbox-image" alt="" />
+    <dialog id="lightbox" class="lightbox" aria-label="Photo viewer" tabindex="-1">
+      <button class="lightbox-close" type="button" aria-label="Close photo viewer" title="Close photo viewer (Esc)">×</button>
+      <button class="lightbox-frame-toggle" type="button" aria-label="Hide photo frame" aria-pressed="true" title="Hide photo frame (B)">
+        <span class="lightbox-frame-icon" aria-hidden="true"></span>
+      </button>
+      <button class="lightbox-rotate" type="button" aria-label="Rotate photo clockwise" title="Rotate clockwise (R)">↻</button>
+      <button class="lightbox-help" type="button" aria-label="Show photo viewer shortcuts" title="Photo viewer shortcuts" aria-controls="lightbox-shortcuts" aria-expanded="false">?</button>
+      <section id="lightbox-shortcuts" class="lightbox-shortcuts" aria-label="Photo viewer shortcuts" hidden>
+        <p>Photo viewer shortcuts</p>
+        <ul>
+          <li><kbd>F</kbd> Fullscreen</li>
+          <li><kbd>G</kbd> Last image · <kbd>G</kbd><kbd>G</kbd> First image</li>
+          <li><kbd>+</kbd> Zoom in · <kbd>−</kbd> Zoom out</li>
+          <li><kbd>0</kbd> Reset / fit photo</li>
+          <li>Click the photo to zoom in or reset</li>
+        </ul>
+      </section>
+      <button class="lightbox-nav lightbox-previous" type="button" aria-label="Previous photo" title="Previous photo (←, H, or J)">←</button>
+      <div class="lightbox-viewport">
+        <img id="lightbox-image" alt="" draggable="false" />
+      </div>
+      <button class="lightbox-reset" type="button" aria-label="Reset zoom" title="Fit photo to screen (0)" hidden>fit</button>
+      <button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo" title="Next photo (→, K, or L)">→</button>
     </dialog>
   </body>
 </html>
