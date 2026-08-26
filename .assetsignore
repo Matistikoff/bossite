@@ -11,3 +11,8 @@
 wrangler.jsonc
 wrangler.toml
 notes.txt
+
+# High-resolution sources and local-only comparison files
+assets/images/[0-9]*/
+assets/compression-preview/
+compression-preview/

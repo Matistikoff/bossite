@@ -1,0 +1,6 @@
+# Local high-resolution source photos; generated WebP files are committed instead.
+assets/images/[0-9]*/
+
+# Local compression comparison.
+assets/compression-preview/
+compression-preview/

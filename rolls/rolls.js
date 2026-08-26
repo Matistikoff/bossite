@@ -46,8 +46,12 @@ function updateLightboxBackground(image) {
   lightboxViewport.style.setProperty("--lightbox-backdrop-image", `url(${JSON.stringify(image.currentSrc || image.src)})`);
 }
 
+function encodeAssetPath(path) {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
 function thumbnailPath(photo) {
-  return `../assets/images/thumbnails/${photo.rollId}/${photo.file}.webp`;
+  return `../assets/images/thumbnails/${encodeURIComponent(photo.rollId)}/${encodeAssetPath(photo.file)}.webp`;
 }
 
 function openPhoto(photo, shouldUpdateUrl = true, transitionDirection = 0) {
@@ -240,7 +244,7 @@ function updateLightboxNavigation(photo) {
 }
 
 function fullImagePath(photo) {
-  return `../assets/images/${photo.rollId}/${photo.file}.JPG`;
+  return `../assets/web-images/${encodeURIComponent(photo.rollId)}/${encodeAssetPath(photo.file)}.webp`;
 }
 
 function preloadAdjacentPhotos(photo) {
@@ -397,8 +401,9 @@ function selectionFromUrl() {
 function photoFromUrl() {
   const photoId = new URLSearchParams(window.location.search).get("photo");
   if (!photoId) return null;
-  const [rollId, file, ...extra] = photoId.split("/");
-  if (!rollId || !file || extra.length) return null;
+  const [rollId, ...fileParts] = photoId.split("/");
+  const file = fileParts.join("/");
+  if (!rollId || !file) return null;
   return archive.photos.find((photo) => photo.rollId === rollId && photo.file === file) || null;
 }
 
@@ -637,7 +642,7 @@ if (!window.ROLLS_ARCHIVE) {
     rolls: window.ROLLS_ARCHIVE.rolls.slice().sort((a, b) => b.sortOrder - a.sortOrder),
   };
   archive.photos = archive.rolls.flatMap((roll) => roll.photos.map((photo) => ({ ...photo, rollId: roll.id, rollName: roll.name })));
-  const rollCount = archive.rolls.length;
+  const rollCount = archive.rolls.reduce((total, roll) => total + (roll.rollCount || 1), 0);
   document.querySelector("#roll-count").textContent = `(${rollCount})`;
   document.querySelector("#shutter-count").textContent = `(${rollCount * shuttersPerRoll})`;
   document.querySelector("#film-cost").textContent = `€${((filmPrice + developmentPrice) * rollCount).toFixed(2)}`;
