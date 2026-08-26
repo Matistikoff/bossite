@@ -1,0 +1,13 @@
+# Repository and dependency metadata
+**/.git
+**/node_modules
+**/.DS_Store
+
+# Local and deployment-only files
+.assetsignore
+.wrangler
+.dev.vars*
+.env*
+wrangler.jsonc
+wrangler.toml
+notes.txt
