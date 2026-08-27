@@ -16,6 +16,7 @@ IMAGES_DIR = ROOT / "assets" / "images"
 THUMBNAILS_DIR = IMAGES_DIR / "thumbnails"
 WEB_IMAGES_DIR = ROOT / "assets" / "web-images"
 DATA_FILE = ROOT / "rolls" / "data.js"
+DATA_PREFIX = "window.ROLLS_ARCHIVE = "
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 THUMBNAIL_SIZE = (1000, 800)
 WEB_IMAGE_SIZE = (3200, 3200)
@@ -105,7 +106,40 @@ def generate_asset(job: tuple[str, Path, Path]) -> str:
     return kind
 
 
+def load_existing_categories() -> dict[tuple[str, str], list[str]]:
+    """Read category assignments from the current generated archive."""
+    if not DATA_FILE.exists():
+        return {}
+
+    contents = DATA_FILE.read_text(encoding="utf-8").strip()
+    if not contents.startswith(DATA_PREFIX) or not contents.endswith(";"):
+        raise ValueError(
+            f"Cannot preserve categories because {DATA_FILE} has an unexpected format."
+        )
+
+    try:
+        archive = json.loads(contents[len(DATA_PREFIX) : -1])
+    except json.JSONDecodeError as error:
+        raise ValueError(
+            f"Cannot preserve categories because {DATA_FILE} is not valid archive data."
+        ) from error
+
+    categories: dict[tuple[str, str], list[str]] = {}
+    for roll in archive.get("rolls", []):
+        roll_id = roll.get("id")
+        if not isinstance(roll_id, str):
+            continue
+        for photo in roll.get("photos", []):
+            file = photo.get("file")
+            photo_categories = photo.get("categories", [])
+            if isinstance(file, str) and isinstance(photo_categories, list):
+                categories[(roll_id, file)] = photo_categories.copy()
+
+    return categories
+
+
 def main() -> None:
+    existing_categories = load_existing_categories()
     roll_dirs = sorted(
         (
             path
@@ -148,7 +182,9 @@ def main() -> None:
             photos.append(
                 {
                     "file": relative_stem.as_posix(),
-                    "categories": [],
+                    "categories": existing_categories.get(
+                        (roll_dir.name, relative_stem.as_posix()), []
+                    ),
                 }
             )
 
@@ -170,7 +206,7 @@ def main() -> None:
 
     archive = {"categories": CATEGORIES, "rolls": rolls}
     DATA_FILE.write_text(
-        "window.ROLLS_ARCHIVE = "
+        DATA_PREFIX
         + json.dumps(archive, ensure_ascii=False, indent=2)
         + ";\n",
         encoding="utf-8",

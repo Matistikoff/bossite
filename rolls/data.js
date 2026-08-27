@@ -42,151 +42,151 @@ window.ROLLS_ARCHIVE = {
       "photos": [
         {
           "file": "000003",
-          "categories": []
+          "categories": ["macro", "abstract"]
         },
         {
           "file": "000007",
-          "categories": []
+          "categories": ["portraits"]
         },
         {
           "file": "000009",
-          "categories": []
+          "categories": ["portraits"]
         },
         {
           "file": "000010",
-          "categories": []
+          "categories": ["macro", "abstract"]
         },
         {
           "file": "000011",
-          "categories": []
+          "categories": ["portraits", "nature"]
         },
         {
           "file": "000015",
-          "categories": []
+          "categories": ["street", "architecture", "abstract"]
         },
         {
           "file": "000018",
-          "categories": []
+          "categories": ["street", "still-life"]
         },
         {
           "file": "000021",
-          "categories": []
+          "categories": ["architecture", "nature"]
         },
         {
           "file": "000024",
-          "categories": []
+          "categories": ["landscapes", "street", "nature"]
         },
         {
           "file": "000025",
-          "categories": []
+          "categories": ["macro", "abstract"]
         },
         {
           "file": "000026",
-          "categories": []
+          "categories": ["street", "nature"]
         },
         {
           "file": "000027",
-          "categories": []
+          "categories": ["street", "still-life"]
         },
         {
           "file": "000028",
-          "categories": []
+          "categories": ["macro", "nature", "still-life"]
         },
         {
           "file": "000030",
-          "categories": []
+          "categories": ["street", "nature"]
         },
         {
           "file": "000033",
-          "categories": []
+          "categories": ["landscapes", "architecture", "nature"]
         },
         {
           "file": "000034",
-          "categories": []
+          "categories": ["landscapes", "nature"]
         },
         {
           "file": "000037",
-          "categories": []
+          "categories": ["architecture", "nature"]
         },
         {
           "file": "000038",
-          "categories": []
+          "categories": ["landscapes", "nature"]
         },
         {
           "file": "000039",
-          "categories": []
+          "categories": ["landscapes", "nature"]
         },
         {
           "file": "000041",
-          "categories": []
+          "categories": ["portraits"]
         },
         {
           "file": "000042",
-          "categories": []
+          "categories": ["portraits"]
         },
         {
           "file": "atriak",
-          "categories": []
+          "categories": ["architecture", "abstract"]
         },
         {
           "file": "budova",
-          "categories": []
+          "categories": ["landscapes", "architecture", "nature"]
         },
         {
           "file": "dunaj",
-          "categories": []
+          "categories": ["landscapes", "nature"]
         },
         {
           "file": "fei",
-          "categories": []
+          "categories": ["architecture", "nature"]
         },
         {
           "file": "fiat",
-          "categories": []
+          "categories": ["landscapes", "street", "nature"]
         },
         {
           "file": "hrad",
-          "categories": []
+          "categories": ["landscapes", "architecture", "nature"]
         },
         {
           "file": "kampo s degim",
-          "categories": []
+          "categories": ["portraits"]
         },
         {
           "file": "ruzove",
-          "categories": []
+          "categories": ["architecture", "abstract"]
         },
         {
           "file": "skatepark",
-          "categories": []
+          "categories": ["portraits", "street"]
         },
         {
           "file": "skodovka",
-          "categories": []
+          "categories": ["nature", "still-life"]
         },
         {
           "file": "snp",
-          "categories": []
+          "categories": ["landscapes", "street", "architecture"]
         },
         {
           "file": "sturak",
-          "categories": []
+          "categories": ["street", "architecture", "nature"]
         },
         {
           "file": "sunshine",
-          "categories": []
+          "categories": ["landscapes", "nature"]
         },
         {
           "file": "upece",
-          "categories": []
+          "categories": ["portraits", "street", "architecture"]
         },
         {
           "file": "voley",
-          "categories": []
+          "categories": ["street", "architecture", "nature"]
         },
         {
           "file": "walk",
-          "categories": []
+          "categories": ["landscapes", "street", "architecture", "nature"]
         }
       ]
     },
