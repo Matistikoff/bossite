@@ -56,6 +56,18 @@ ROLL_LABELS = {
     "40_Pohoda": "Pohoda",
     "42_Vienna": "Viedeň",
 }
+ROLL_HEROES = {
+    "1_The_First": "skodovka",
+    "2_Home": "20241109_225821551_iOS_nasiADom",
+    "3_Filip_Fodbal": "20241113_221349995_iOS_akcia",
+    "4_BA_Saska_Miska": "20241123_204903783_iOS_the_portrait",
+    "5_BW_BA": "20241210_114901079_iOS_ufoPetr",
+    "6_OkoloVianoc24": "karlovkaFromHell",
+    "7_Chata24": "chata",
+    "8_Vianoce24": "pripravy",
+    "9_StefanskyVystup24": "000038_dobryVecer",
+    "10_OkoloVianoc24": "peknyMilotin",
+}
 
 CATEGORIES = [
     {"id": "portraits", "label": "Portréty", "emoji": "👤"},
@@ -218,6 +230,8 @@ def main() -> None:
     for roll_dir in roll_dirs:
         photos = []
         sources = image_files(roll_dir)
+        if not sources:
+            continue
         stem_counts = Counter(
             source.relative_to(roll_dir).with_suffix("").as_posix().casefold()
             for source in sources
@@ -256,15 +270,21 @@ def main() -> None:
                 }
             )
 
-        rolls.append(
-            {
-                "id": roll_dir.name,
-                "name": roll_label(roll_dir.name),
-                "sortOrder": roll_number(roll_dir.name),
-                "rollCount": LOGICAL_ROLL_COUNTS.get(roll_dir.name, 1),
-                "photos": photos,
-            }
-        )
+        roll = {
+            "id": roll_dir.name,
+            "name": roll_label(roll_dir.name),
+            "sortOrder": roll_number(roll_dir.name),
+            "rollCount": LOGICAL_ROLL_COUNTS.get(roll_dir.name, 1),
+            "photos": photos,
+        }
+        if roll_dir.name in ROLL_HEROES:
+            hero = ROLL_HEROES[roll_dir.name]
+            if hero not in {photo["file"] for photo in photos}:
+                raise ValueError(
+                    f"Hero photo {hero!r} does not exist in roll {roll_dir.name!r}."
+                )
+            roll["hero"] = hero
+        rolls.append(roll)
         photo_count += len(photos)
 
     generated_counts: Counter[str] = Counter()

@@ -301,7 +301,8 @@ window.ROLLS_ARCHIVE = {
             "nature"
           ]
         }
-      ]
+      ],
+      "hero": "skodovka"
     },
     {
       "id": "2_Home",
@@ -556,7 +557,8 @@ window.ROLLS_ARCHIVE = {
             "abstract"
           ]
         }
-      ]
+      ],
+      "hero": "20241109_225821551_iOS_nasiADom"
     },
     {
       "id": "3_Filip_Fodbal",
@@ -747,7 +749,8 @@ window.ROLLS_ARCHIVE = {
             "still-life"
           ]
         }
-      ]
+      ],
+      "hero": "20241113_221349995_iOS_akcia"
     },
     {
       "id": "4_BA_Saska_Miska",
@@ -957,7 +960,8 @@ window.ROLLS_ARCHIVE = {
             "architecture"
           ]
         }
-      ]
+      ],
+      "hero": "20241123_204903783_iOS_the_portrait"
     },
     {
       "id": "5_BW_BA",
@@ -1191,7 +1195,8 @@ window.ROLLS_ARCHIVE = {
             "street"
           ]
         }
-      ]
+      ],
+      "hero": "20241210_114901079_iOS_ufoPetr"
     },
     {
       "id": "6_OkoloVianoc24",
@@ -1461,7 +1466,8 @@ window.ROLLS_ARCHIVE = {
             "abstract"
           ]
         }
-      ]
+      ],
+      "hero": "karlovkaFromHell"
     },
     {
       "id": "7_Chata24",
@@ -1670,7 +1676,8 @@ window.ROLLS_ARCHIVE = {
             "abstract"
           ]
         }
-      ]
+      ],
+      "hero": "chata"
     },
     {
       "id": "8_Vianoce24",
@@ -1865,7 +1872,8 @@ window.ROLLS_ARCHIVE = {
             "still-life"
           ]
         }
-      ]
+      ],
+      "hero": "pripravy"
     },
     {
       "id": "9_StefanskyVystup24",
@@ -2123,7 +2131,8 @@ window.ROLLS_ARCHIVE = {
             "nature"
           ]
         }
-      ]
+      ],
+      "hero": "000038_dobryVecer"
     },
     {
       "id": "10_OkoloVianoc24",
@@ -2326,7 +2335,8 @@ window.ROLLS_ARCHIVE = {
             "nature"
           ]
         }
-      ]
+      ],
+      "hero": "peknyMilotin"
     },
     {
       "id": "11_Macedonsko25",

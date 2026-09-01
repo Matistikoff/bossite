@@ -33,6 +33,15 @@ const rollEmojis = {
   "40_Pohoda": "🎶",
   "42_Vienna": "🇦🇹",
 };
+const flagAssets = {
+  "🇦🇹": "../assets/flags/at.svg",
+  "🇨🇿": "../assets/flags/cz.svg",
+  "🇭🇺": "../assets/flags/hu.svg",
+  "🇮🇩": "../assets/flags/id.svg",
+  "🇲🇰": "../assets/flags/mk.svg",
+  "🇸🇮": "../assets/flags/si.svg",
+  "🇺🇦": "../assets/flags/ua.svg",
+};
 let archive;
 let photos = [];
 let nextPhoto = 0;
@@ -41,12 +50,19 @@ let loadedPhotos = [];
 let activeMode = "rolls";
 let activeFilter = "all";
 let galleryVersion = 0;
+let pendingRowPhotos = [];
+let pendingRowRatio = 0;
+let renderedGalleryWidth = 0;
+let galleryRelayoutFrame = 0;
+let forceGalleryRelayout = false;
+let revealingGalleryVersion = 0;
+let revealedRowCount = 0;
 
 const gallery = document.querySelector("#gallery");
 const sentinel = document.querySelector("#gallery-sentinel");
 const dialog = document.querySelector("#lightbox");
+const intro = document.querySelector(".intro--photo");
 const pageTitle = document.querySelector("#page-title");
-const rollYear = document.querySelector("#roll-year");
 let lightboxImage = document.querySelector("#lightbox-image");
 const densityInput = document.querySelector("#density");
 const filterOptions = document.querySelector("#filter-options");
@@ -138,11 +154,7 @@ function openPhoto(photo, shouldUpdateUrl = true, transitionDirection = 0) {
     dialog.classList.remove("is-closing");
     document.documentElement.classList.add("lightbox-open");
     document.body.classList.add("lightbox-open");
-    dialog.showModal();
-    enterLightboxFullscreen();
-    // Don't let the browser's dialog focus management make the close control
-    // appear active as soon as a photo opens.
-    dialog.focus({ preventScroll: true });
+    showLightboxDialog();
   }
   // Keep the current image painted until the replacement has fully decoded.
   // This removes the blank frame that can otherwise appear despite a cache hit.
@@ -234,8 +246,21 @@ async function toggleLightboxFullscreen() {
   await enterLightboxFullscreen();
 }
 
+async function showLightboxDialog() {
+  // Chrome puts modal dialogs and fullscreen elements in the same top-layer
+  // stack. Enter fullscreen first so showModal() places the dialog above the
+  // fullscreen document instead of letting the document cover the dialog.
+  await enterLightboxFullscreen();
+  if (dialog.open) return;
+  dialog.showModal();
+  // Don't let the browser's dialog focus management make the close control
+  // appear active as soon as a photo opens.
+  dialog.focus({ preventScroll: true });
+  requestAnimationFrame(resetZoom);
+}
+
 async function enterLightboxFullscreen() {
-  if (!dialog.open || document.fullscreenElement) return;
+  if (document.fullscreenElement) return;
   try {
     await document.documentElement.requestFullscreen();
     lightboxFullscreen = true;
@@ -320,10 +345,15 @@ function targetRowHeight() {
   return window.matchMedia("(max-width: 720px)").matches ? 170 - density * 1.16 : 340 - density * 2.6;
 }
 
-function addRow(rowPhotos, height, justify = true) {
+function createRow(rowPhotos, height, justify = true) {
   const row = document.createElement("div");
   row.className = "gallery-row";
   row.style.height = `${height}px`;
+  if (revealingGalleryVersion === galleryVersion) {
+    row.classList.add("is-roll-reveal");
+    row.style.setProperty("--reveal-delay", `${Math.min(revealedRowCount, 4) * 45}ms`);
+    revealedRowCount += 1;
+  }
   rowPhotos.forEach((photo) => {
     const button = document.createElement("button");
     button.className = "photo";
@@ -335,46 +365,90 @@ function addRow(rowPhotos, height, justify = true) {
       button.style.flex = `0 0 ${Math.round(photo.ratio * height)}px`;
     }
     button.setAttribute("aria-label", `Otvoriť fotografiu z rollky ${photo.rollName}`);
-    const image = document.createElement("img");
-    image.src = thumbnailPath(photo);
-    image.alt = "";
-    image.width = photo.width;
-    image.height = photo.height;
-    image.loading = "lazy";
-    image.decoding = "async";
+    const image = photo.thumbnailImage;
     button.append(image);
     button.addEventListener("click", () => openPhoto(photo));
     row.append(button);
   });
-  gallery.append(row);
+  return row;
+}
+
+function galleryLayoutMetrics() {
+  const galleryWidth = gallery.clientWidth;
+  if (!galleryWidth) return null;
+  const rowHeight = targetRowHeight();
+  const gap = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) * (window.matchMedia("(max-width: 720px)").matches ? .3 : .45);
+  return { galleryWidth, rowHeight, gap, threshold: galleryWidth / rowHeight };
+}
+
+function appendGalleryPhotos(newPhotos, showFinalRow, metrics = galleryLayoutMetrics()) {
+  if (!metrics) return;
+  const { galleryWidth, rowHeight, gap, threshold } = metrics;
+  const fragment = document.createDocumentFragment();
+
+  newPhotos.forEach((photo) => {
+    pendingRowPhotos.push(photo);
+    pendingRowRatio += photo.ratio;
+    if (pendingRowRatio >= threshold) {
+      fragment.append(createRow(
+        pendingRowPhotos,
+        Math.round((galleryWidth - gap * (pendingRowPhotos.length - 1)) / pendingRowRatio),
+      ));
+      pendingRowPhotos = [];
+      pendingRowRatio = 0;
+    }
+  });
+
+  if (showFinalRow && pendingRowPhotos.length) {
+    fragment.append(createRow(pendingRowPhotos, Math.round(rowHeight), false));
+    pendingRowPhotos = [];
+    pendingRowRatio = 0;
+  }
+
+  gallery.append(fragment);
+  renderedGalleryWidth = galleryWidth;
 }
 
 function layoutGallery(showFinalRow) {
-  const galleryWidth = gallery.clientWidth;
-  if (!galleryWidth) return;
-  const rowHeight = targetRowHeight();
-  const gap = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) * (window.matchMedia("(max-width: 720px)").matches ? .3 : .45);
-  const threshold = galleryWidth / rowHeight;
-  let row = [];
-  let rowRatio = 0;
+  const metrics = galleryLayoutMetrics();
+  if (!metrics) return;
   gallery.replaceChildren();
-  loadedPhotos.forEach((photo, index) => {
-    row.push(photo);
-    rowRatio += photo.ratio;
-    if (rowRatio >= threshold) {
-      addRow(row, Math.round((galleryWidth - gap * (row.length - 1)) / rowRatio));
-      row = [];
-      rowRatio = 0;
-    } else if (showFinalRow && index === loadedPhotos.length - 1) {
-      addRow(row, Math.round(rowHeight), false);
-    }
+  pendingRowPhotos = [];
+  pendingRowRatio = 0;
+  appendGalleryPhotos(loadedPhotos, showFinalRow, metrics);
+}
+
+function scheduleGalleryRelayout(force = false) {
+  forceGalleryRelayout ||= force;
+  if (galleryRelayoutFrame) return;
+  galleryRelayoutFrame = requestAnimationFrame(() => {
+    galleryRelayoutFrame = 0;
+    const shouldRelayout = forceGalleryRelayout || Math.abs(gallery.clientWidth - renderedGalleryWidth) >= 1;
+    forceGalleryRelayout = false;
+    if (shouldRelayout) layoutGallery(nextPhoto === photos.length);
+    if (dialog.open) applyZoom();
   });
 }
 
 function preload(photo) {
   return new Promise((resolve) => {
     const image = new Image();
-    image.onload = () => resolve({ ...photo, width: image.naturalWidth, height: image.naturalHeight, ratio: image.naturalWidth / image.naturalHeight });
+    image.alt = "";
+    image.loading = "eager";
+    image.fetchPriority = "low";
+    image.decoding = "async";
+    image.onload = () => {
+      const preparedPhoto = {
+        ...photo,
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+        ratio: image.naturalWidth / image.naturalHeight,
+        thumbnailImage: image,
+      };
+      image.width = preparedPhoto.width;
+      image.height = preparedPhoto.height;
+      image.decode().then(() => resolve(preparedPhoto), () => resolve(preparedPhoto));
+    };
     image.onerror = () => resolve(null);
     image.src = thumbnailPath(photo);
   });
@@ -394,7 +468,12 @@ async function loadNextBatch() {
   }
   loadedPhotos.push(...preparedPhotos);
   const allPhotosLoaded = nextPhoto === photos.length;
-  layoutGallery(allPhotosLoaded);
+  if (renderedGalleryWidth && Math.abs(gallery.clientWidth - renderedGalleryWidth) >= 1) {
+    layoutGallery(allPhotosLoaded);
+  } else {
+    appendGalleryPhotos(preparedPhotos, allPhotosLoaded);
+  }
+  if (revealingGalleryVersion === version) revealingGalleryVersion = 0;
   sentinel.hidden = allPhotosLoaded;
   if (allPhotosLoaded) observer.disconnect();
   isLoading = false;
@@ -414,22 +493,71 @@ function yearForRoll(roll) {
   return 2026;
 }
 
+function appendEmoji(container, value, addLeadingSpace = false) {
+  if (addLeadingSpace) container.append("\u00a0");
+
+  const emojiParts = Array.from(value);
+  for (let index = 0; index < emojiParts.length;) {
+    const possibleFlag = `${emojiParts[index] || ""}${emojiParts[index + 1] || ""}`;
+    const flagSrc = flagAssets[possibleFlag];
+    if (flagSrc) {
+      const flag = document.createElement("img");
+      flag.className = "emoji-flag";
+      flag.src = flagSrc;
+      flag.alt = "";
+      flag.decoding = "async";
+      container.append(flag);
+      index += 2;
+      continue;
+    }
+
+    container.append(emojiParts[index]);
+    index += 1;
+  }
+}
+
+function loadIntroHero(activeRoll) {
+  if (!activeRoll?.hero) {
+    intro.style.removeProperty("--intro-photo");
+    return Promise.resolve();
+  }
+
+  const heroPath = `../assets/web-images/${encodeURIComponent(activeRoll.id)}/${encodeAssetPath(activeRoll.hero)}.webp`;
+  const image = new Image();
+  image.alt = "";
+  image.fetchPriority = "high";
+  image.decoding = "async";
+  image.src = heroPath;
+  intro.style.setProperty("--intro-photo", `url(${JSON.stringify(heroPath)})`);
+
+  const decode = () => image.decode().catch(() => {});
+  if (image.complete) return image.naturalWidth ? decode() : Promise.resolve();
+  return new Promise((resolve) => {
+    image.addEventListener("load", () => decode().then(resolve), { once: true });
+    image.addEventListener("error", resolve, { once: true });
+  });
+}
+
 function updatePageTitle() {
   const activeRoll = activeMode === "rolls" && activeFilter !== "all"
     ? archive.rolls.find((roll) => roll.id === activeFilter)
     : null;
+  const heroReady = loadIntroHero(activeRoll);
   pageTitle.replaceChildren(activeRoll?.name || "Mito.Rolls");
-  if (activeRoll) {
-    const emoji = document.createElement("span");
-    emoji.className = "roll-title-emoji";
-    emoji.setAttribute("aria-hidden", "true");
-    emoji.textContent = `\u00a0${rollEmojis[activeRoll.id] || "🎞️"}`;
-    pageTitle.append(emoji);
-  }
   pageTitle.classList.toggle("is-roll-title", Boolean(activeRoll));
-  rollYear.textContent = activeRoll
-    ? yearForRoll(activeRoll)
-    : Math.max(...archive.rolls.map(yearForRoll));
+  return heroReady;
+}
+
+function animateRollChange(version) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  revealingGalleryVersion = version;
+  revealedRowCount = 0;
+  intro.classList.remove("is-roll-changing");
+  void intro.offsetWidth;
+  intro.classList.add("is-roll-changing");
+  window.setTimeout(() => {
+    if (version === galleryVersion) intro.classList.remove("is-roll-changing");
+  }, 520);
 }
 
 function setActiveMode(mode) {
@@ -442,7 +570,39 @@ function setActiveMode(mode) {
   });
 }
 
+function archiveRouteFromUrl() {
+  const route = window.location.protocol === "file:"
+    ? window.location.hash.replace(/^#\/?/, "")
+    : (() => {
+        const marker = "/rolls/";
+        const markerIndex = window.location.pathname.indexOf(marker);
+        if (markerIndex === -1) return "";
+        return window.location.pathname.slice(markerIndex + marker.length);
+      })();
+  const parts = route.split("/").filter(Boolean).map((part) => {
+    try {
+      return decodeURIComponent(part);
+    } catch {
+      return part;
+    }
+  });
+
+  if (!parts.length || parts[0] === "index.html") return null;
+  if (parts[0] === "subjects") {
+    return parts[1] ? { mode: "subjects", filter: parts[1], photoFile: null } : null;
+  }
+  return { mode: "rolls", filter: parts[0], photoFile: parts.slice(1).join("/") || null };
+}
+
 function selectionFromUrl() {
+  const route = archiveRouteFromUrl();
+  if (route?.mode === "rolls" && archive.rolls.some((roll) => roll.id === route.filter)) {
+    return { mode: "rolls", filter: route.filter };
+  }
+  if (route?.mode === "subjects" && archive.categories.some((category) => category.id === route.filter)) {
+    return { mode: "subjects", filter: route.filter };
+  }
+
   const params = new URLSearchParams(window.location.search);
   const rollId = params.get("roll");
   const subjectId = params.get("subject");
@@ -457,22 +617,61 @@ function selectionFromUrl() {
 }
 
 function photoFromUrl() {
-  const photoId = new URLSearchParams(window.location.search).get("photo");
+  const route = archiveRouteFromUrl();
+  let photoId = route?.mode === "rolls" && route.photoFile
+    ? `${route.filter}/${route.photoFile}`
+    : new URLSearchParams(window.location.search).get("photo");
   if (!photoId) return null;
+  if (!photoId.includes("/") && route?.mode === "rolls") photoId = `${route.filter}/${photoId}`;
   const [rollId, ...fileParts] = photoId.split("/");
   const file = fileParts.join("/");
   if (!rollId || !file) return null;
   return archive.photos.find((photo) => photo.rollId === rollId && photo.file === file) || null;
 }
 
-function updateUrl(photoId = null, shouldReplace = false) {
+function encodedRoute(value) {
+  return value.split("/").map(encodeURIComponent).join("/");
+}
+
+function archiveBasePath() {
+  const marker = "/rolls/";
+  const markerIndex = window.location.pathname.indexOf(marker);
+  if (markerIndex !== -1) return window.location.pathname.slice(0, markerIndex + marker.length);
+  return window.location.pathname.replace(/[^/]*$/, "");
+}
+
+function updateUrl(photoId = null, shouldReplace = false, isLightboxHistory = Boolean(photoId)) {
   const url = new URL(window.location.href);
   url.searchParams.delete("roll");
   url.searchParams.delete("subject");
   url.searchParams.delete("photo");
-  if (activeFilter !== "all") url.searchParams.set(activeMode === "rolls" ? "roll" : "subject", activeFilter);
-  if (photoId) url.searchParams.set("photo", photoId);
-  const state = photoId ? { lightbox: true } : null;
+  const [photoRollId, ...photoFileParts] = photoId?.split("/") || [];
+  const photoFile = photoFileParts.join("/");
+
+  if (window.location.protocol === "file:") {
+    if (activeFilter === "all") {
+      url.hash = "";
+      if (photoId) url.searchParams.set("photo", photoId);
+    } else if (activeMode === "subjects") {
+      url.hash = `/subjects/${encodedRoute(activeFilter)}`;
+      if (photoId) url.searchParams.set("photo", photoId);
+    } else {
+      const photoRoute = photoRollId === activeFilter && photoFile ? `/${encodedRoute(photoFile)}` : "";
+      url.hash = `/${encodedRoute(activeFilter)}${photoRoute}`;
+      if (photoId && photoRollId !== activeFilter) url.searchParams.set("photo", photoId);
+    }
+  } else {
+    const basePath = archiveBasePath();
+    url.hash = "";
+    if (activeFilter === "all") url.pathname = basePath;
+    else if (activeMode === "subjects") url.pathname = `${basePath}subjects/${encodedRoute(activeFilter)}/`;
+    else url.pathname = `${basePath}${encodedRoute(activeFilter)}/`;
+
+    if (photoId) {
+      url.searchParams.set("photo", photoRollId === activeFilter ? photoFile : photoId);
+    }
+  }
+  const state = isLightboxHistory ? { lightbox: true } : null;
   if (shouldReplace) history.replaceState(state, "", url);
   else history.pushState(state, "", url);
 }
@@ -497,7 +696,7 @@ function renderFilterOptions() {
       const emojiText = document.createElement("span");
       emojiText.className = "filter-emoji";
       emojiText.setAttribute("aria-hidden", "true");
-      emojiText.textContent = emoji;
+      appendEmoji(emojiText, emoji);
       button.append(emojiText);
     }
     button.addEventListener("click", () => selectFilter(id, true));
@@ -533,20 +732,28 @@ function renderFilterOptions() {
   filterOptions.replaceChildren(...rows);
 }
 
-function selectFilter(filter, shouldUpdateUrl = false) {
+async function selectFilter(filter, shouldUpdateUrl = false, shouldAnimate = shouldUpdateUrl) {
   galleryVersion += 1;
+  const version = galleryVersion;
+  observer.disconnect();
   activeFilter = filter;
   setActiveMode(activeMode);
-  updatePageTitle();
+  if (shouldAnimate) animateRollChange(version);
+  const heroReady = updatePageTitle();
   photos = currentPhotos();
   nextPhoto = 0;
   loadedPhotos = [];
+  pendingRowPhotos = [];
+  pendingRowRatio = 0;
+  renderedGalleryWidth = 0;
   gallery.replaceChildren();
   sentinel.hidden = false;
-  observer.observe(sentinel);
   renderFilterOptions();
-  loadNextBatch();
   if (shouldUpdateUrl) updateUrl();
+  await heroReady;
+  if (version !== galleryVersion) return;
+  observer.observe(sentinel);
+  loadNextBatch();
 }
 
 const observer = new IntersectionObserver((entries) => {
@@ -565,7 +772,7 @@ window.addEventListener("popstate", () => {
   const selection = selectionFromUrl();
   if (selection.mode !== activeMode || selection.filter !== activeFilter) {
     setActiveMode(selection.mode);
-    selectFilter(selection.filter);
+    selectFilter(selection.filter, false, true);
   }
   syncLightboxWithUrl();
 });
@@ -656,18 +863,16 @@ dialog.addEventListener("close", () => {
   if (lightboxFullscreen && document.fullscreenElement) document.exitFullscreen();
   document.documentElement.classList.remove("lightbox-open");
   document.body.classList.remove("lightbox-open");
-  if (isSyncingLightbox || !new URLSearchParams(window.location.search).has("photo")) return;
+  if (isSyncingLightbox || !photoFromUrl()) return;
   if (history.state?.lightbox) history.back();
   else updateUrl(null, true);
 });
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement) lightboxFullscreen = false;
+  if (dialog.open) requestAnimationFrame(resetZoom);
 });
-window.addEventListener("resize", () => {
-  layoutGallery(nextPhoto === photos.length);
-  if (dialog.open) applyZoom();
-});
-densityInput.addEventListener("input", () => layoutGallery(nextPhoto === photos.length));
+window.addEventListener("resize", () => scheduleGalleryRelayout());
+densityInput.addEventListener("input", () => scheduleGalleryRelayout(true));
 document.addEventListener("keydown", (event) => {
   const target = event.target;
   const isTyping = target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
@@ -744,5 +949,7 @@ if (!window.ROLLS_ARCHIVE) {
   setActiveMode(selection.mode);
   renderFilterOptions();
   selectFilter(selection.filter);
+  const initialPhoto = photoFromUrl();
+  updateUrl(initialPhoto ? `${initialPhoto.rollId}/${initialPhoto.file}` : null, true, false);
   syncLightboxWithUrl();
 }

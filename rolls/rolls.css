@@ -44,6 +44,7 @@ body.lightbox-open {
 .density-control {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: .55rem;
   font-size: .62rem;
   letter-spacing: .06em;
@@ -63,6 +64,7 @@ main { padding: 0 0 5rem; }
 
 .intro { width: 100%; margin: 4vw 0 clamp(3rem, 8vw, 7rem); }
 .intro--photo {
+  --intro-photo: url("../assets/web-images/20...32_Indonezia/indonézia/Canail Film Lab_73034(2)_fav2.webp");
   position: relative;
   display: flex;
   width: 100%;
@@ -73,11 +75,11 @@ main { padding: 0 0 5rem; }
   margin-top: 0;
   margin-left: 0;
   padding: clamp(1.5rem, 4vw, 3.75rem);
-  border: 1px solid rgb(255 255 255 / .25);
+  border: 0;
   border-radius: 0;
   background:
     linear-gradient(180deg, rgb(10 13 11 / .16) 10%, rgb(10 13 11 / .28) 52%, rgb(10 13 11 / .76) 100%),
-    url("../assets/web-images/20...32_Indonezia/indonézia/Canail Film Lab_73034(2)_fav2.webp") center 58% / cover no-repeat;
+    var(--intro-photo) center 58% / cover no-repeat;
   box-shadow: 0 1.5rem 4rem rgb(44 39 27 / .18);
   color: #fffdf5;
 }
@@ -93,7 +95,6 @@ main { padding: 0 0 5rem; }
   text-shadow: 0 1px .8rem rgb(0 0 0 / .65);
 }
 .intro--photo .density-control input { accent-color: #fffdf5; }
-.intro--photo .eyebrow,
 .intro--photo h1,
 .intro--photo .lede,
 .intro--photo .archive-controls { position: relative; z-index: 1; }
@@ -130,7 +131,33 @@ main { padding: 0 0 5rem; }
 .intro--photo .filter-button.is-active:hover,
 .intro--photo .mode-button.is-active:focus-visible,
 .intro--photo .filter-button.is-active:focus-visible { background: #fffdf5; }
-.eyebrow { margin: 0 0 1rem; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+.intro--photo.is-roll-changing::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  content: "";
+  background: linear-gradient(105deg, transparent 28%, rgb(255 248 222 / .2) 48%, transparent 68%);
+  pointer-events: none;
+  animation: roll-change-flash 420ms cubic-bezier(.2, .7, .2, 1) both;
+}
+.intro--photo.is-roll-changing h1 { animation: roll-title-enter 360ms cubic-bezier(.2, .7, .2, 1) both; }
+.intro--photo.is-roll-changing .lede,
+.intro--photo.is-roll-changing .archive-controls {
+  animation: roll-content-enter 340ms 45ms cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes roll-change-flash {
+  from { opacity: 0; transform: translateX(-35%); }
+  35% { opacity: 1; }
+  to { opacity: 0; transform: translateX(35%); }
+}
+@keyframes roll-title-enter {
+  from { opacity: 0; transform: translateY(.18em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes roll-content-enter {
+  from { opacity: 0; transform: translateY(.55rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
 h1 {
   margin: 0;
   font-family: "Playfair Display", Georgia, serif;
@@ -143,13 +170,6 @@ h1 {
 h1.is-roll-title {
   font-size: clamp(3rem, 10vw, 9rem);
   line-height: .88;
-}
-.roll-title-emoji {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-  font-size: .7em;
-  font-style: normal;
-  letter-spacing: 0;
-  white-space: nowrap;
 }
 .lede { max-width: 50rem; margin: 2rem 0 0; font-size: clamp(.88rem, 1.4vw, 1rem); line-height: 1.7; }
 
@@ -170,7 +190,23 @@ h1.is-roll-title {
 }
 .mode-button, .filter-button { cursor: pointer; }
 .filter-button.has-emoji { display: inline-flex; align-items: center; gap: .4rem; }
-.filter-emoji { font-size: .85rem; line-height: .7; }
+.filter-emoji {
+  display: inline-flex;
+  align-items: center;
+  gap: .16em;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: .85rem;
+  line-height: .7;
+}
+.emoji-flag {
+  display: inline-block;
+  width: 1.34em;
+  height: .94em;
+  border-radius: .08em;
+  box-shadow: 0 0 0 1px rgb(23 23 18 / .12);
+  object-fit: cover;
+  vertical-align: -.08em;
+}
 .filter-year-badge {
   min-width: 4.5rem;
   border-color: transparent;
@@ -190,6 +226,13 @@ h1.is-roll-title {
   width: 100%;
   gap: .45rem;
   margin-bottom: .45rem;
+}
+.gallery-row.is-roll-reveal {
+  animation: roll-row-enter 420ms var(--reveal-delay, 0ms) cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes roll-row-enter {
+  from { opacity: 0; transform: translateY(.75rem); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .photo {
@@ -491,6 +534,11 @@ h1.is-roll-title {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro--photo.is-roll-changing::after,
+  .intro--photo.is-roll-changing h1,
+  .intro--photo.is-roll-changing .lede,
+  .intro--photo.is-roll-changing .archive-controls,
+  .gallery-row.is-roll-reveal,
   .photo img,
   .lightbox img,
   .lightbox-image-enter-next,

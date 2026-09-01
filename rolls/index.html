@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#10100e" />
     <title>Rollky — mito.boss</title>
+    <base href="./" />
     <link rel="preload" as="image" href="../assets/web-images/20...32_Indonezia/indonézia/Canail Film Lab_73034(2)_fav2.webp" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="./rolls.css" />
     <script src="./data.js" defer></script>
@@ -16,18 +17,17 @@
         <header class="site-header">
           <a class="home-link" href="../index.html">mito.boss</a>
           <div class="header-controls">
-            <label class="density-control" for="density">
-              <span>hustota fotiek</span>
-              <input id="density" type="range" min="0" max="100" value="50" />
-            </label>
             <div class="archive-stats" aria-label="Štatistiky archívu">
               <p>rollky <span id="roll-count"></span></p>
               <p>zábery <span id="shutter-count"></span></p>
               <p>náklady <span id="film-cost"></span></p>
+              <label class="density-control" for="density">
+                <span>hustota fotiek</span>
+                <input id="density" type="range" min="0" max="100" value="0" />
+              </label>
             </div>
           </div>
         </header>
-        <p id="roll-year" class="eyebrow">2026</p>
         <h1 id="page-title">Mito.Rolls</h1>
         <p class="lede">Malé momenty zachytené na filmových pixeloch. Prezri si najnovšie rollky alebo vyber kategóriu.</p>
         <div class="archive-controls" aria-label="Filtre galérie">
