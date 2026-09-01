@@ -1,7 +1,38 @@
 const batchSize = 12;
 const shuttersPerRoll = 36;
-const filmPrice = 10;
-const developmentPrice = 6.9;
+const averageCostPerRoll = 20;
+const rollEmojis = {
+  "1_The_First": "🎞️",
+  "2_Home": "🏠",
+  "3_Filip_Fodbal": "⚽",
+  "4_BA_Saska_Miska": "🏙️",
+  "5_BW_BA": "🖤",
+  "6_OkoloVianoc24": "🎄",
+  "7_Chata24": "🏡",
+  "8_Vianoce24": "🎄",
+  "9_StefanskyVystup24": "⛰️",
+  "10_OkoloVianoc24": "🎄",
+  "11_Macedonsko25": "🇲🇰",
+  "12_Lost": "🧭",
+  "13_Lyziarsky": "⛷️",
+  "14_KrojeSkate": "🛹",
+  "15_Slovinsko25": "🇸🇮",
+  "16_Zuberec_BA": "🏔️",
+  "17_Inzinier": "🎓",
+  "18_LiubovTura_Promocie": "🥾🎓",
+  "19_BW2": "🖤",
+  "20...32_Indonezia": "🇮🇩",
+  "33_SlovinskoLiubov": "🇸🇮❤️",
+  "34_Forsta25": "🎞️",
+  "35_Godfather": "🤵",
+  "36_LiubovBarla": "🩼",
+  "37_Prve_Svate_Prijimanie": "⛪",
+  "38_LiubovPraha": "🇨🇿",
+  "39_Budapest": "🇭🇺",
+  "40...41_Ukrajina": "🇺🇦",
+  "40_Pohoda": "🎶",
+  "42_Vienna": "🇦🇹",
+};
 let archive;
 let photos = [];
 let nextPhoto = 0;
@@ -14,6 +45,8 @@ let galleryVersion = 0;
 const gallery = document.querySelector("#gallery");
 const sentinel = document.querySelector("#gallery-sentinel");
 const dialog = document.querySelector("#lightbox");
+const pageTitle = document.querySelector("#page-title");
+const rollYear = document.querySelector("#roll-year");
 let lightboxImage = document.querySelector("#lightbox-image");
 const densityInput = document.querySelector("#density");
 const filterOptions = document.querySelector("#filter-options");
@@ -176,8 +209,8 @@ function rotatePhoto() {
 
 function togglePhotoFrame() {
   const frameIsVisible = !dialog.classList.toggle("without-frame");
-  frameToggleButton.setAttribute("aria-label", frameIsVisible ? "Hide photo frame" : "Show photo frame");
-  frameToggleButton.title = `${frameIsVisible ? "Hide" : "Show"} photo frame (B)`;
+  frameToggleButton.setAttribute("aria-label", frameIsVisible ? "Skryť rám fotografie" : "Zobraziť rám fotografie");
+  frameToggleButton.title = `${frameIsVisible ? "Skryť" : "Zobraziť"} rám fotografie (B)`;
   frameToggleButton.setAttribute("aria-pressed", String(frameIsVisible));
 }
 
@@ -301,7 +334,7 @@ function addRow(rowPhotos, height, justify = true) {
     } else {
       button.style.flex = `0 0 ${Math.round(photo.ratio * height)}px`;
     }
-    button.setAttribute("aria-label", `Open photo from ${photo.rollName}`);
+    button.setAttribute("aria-label", `Otvoriť fotografiu z rollky ${photo.rollName}`);
     const image = document.createElement("img");
     image.src = thumbnailPath(photo);
     image.alt = "";
@@ -375,11 +408,36 @@ function currentPhotos() {
   return activeFilter === "all" ? archive.photos : archive.photos.filter((photo) => photo.categories.includes(activeFilter));
 }
 
+function yearForRoll(roll) {
+  if (roll.sortOrder <= 10) return 2024;
+  if (roll.sortOrder <= 20) return 2025;
+  return 2026;
+}
+
+function updatePageTitle() {
+  const activeRoll = activeMode === "rolls" && activeFilter !== "all"
+    ? archive.rolls.find((roll) => roll.id === activeFilter)
+    : null;
+  pageTitle.replaceChildren(activeRoll?.name || "Mito.Rolls");
+  if (activeRoll) {
+    const emoji = document.createElement("span");
+    emoji.className = "roll-title-emoji";
+    emoji.setAttribute("aria-hidden", "true");
+    emoji.textContent = `\u00a0${rollEmojis[activeRoll.id] || "🎞️"}`;
+    pageTitle.append(emoji);
+  }
+  pageTitle.classList.toggle("is-roll-title", Boolean(activeRoll));
+  rollYear.textContent = activeRoll
+    ? yearForRoll(activeRoll)
+    : Math.max(...archive.rolls.map(yearForRoll));
+}
+
 function setActiveMode(mode) {
   activeMode = mode;
   document.querySelectorAll(".mode-button").forEach((button) => {
     const selected = button.dataset.mode === mode;
-    button.classList.toggle("is-active", selected);
+    const visuallyActive = selected && (mode !== "rolls" || activeFilter === "all");
+    button.classList.toggle("is-active", visuallyActive);
     button.setAttribute("aria-selected", String(selected));
   });
 }
@@ -428,22 +486,58 @@ function syncLightboxWithUrl() {
 }
 
 function renderFilterOptions() {
-  const options = activeMode === "rolls"
-    ? [{ id: "all", label: "All rolls" }, ...archive.rolls.map((roll) => ({ id: roll.id, label: roll.name }))]
-    : [{ id: "all", label: "All subjects" }, ...archive.categories];
-  filterOptions.replaceChildren(...options.map(({ id, label }) => {
+  const createFilterButton = ({ id, label, emoji }) => {
     const button = document.createElement("button");
-    button.className = `filter-button${id === activeFilter ? " is-active" : ""}`;
+    button.className = `filter-button${emoji ? " has-emoji" : ""}${id === activeFilter ? " is-active" : ""}`;
     button.type = "button";
-    button.textContent = label;
+    const labelText = document.createElement("span");
+    labelText.textContent = label;
+    button.append(labelText);
+    if (emoji) {
+      const emojiText = document.createElement("span");
+      emojiText.className = "filter-emoji";
+      emojiText.setAttribute("aria-hidden", "true");
+      emojiText.textContent = emoji;
+      button.append(emojiText);
+    }
     button.addEventListener("click", () => selectFilter(id, true));
     return button;
-  }));
+  };
+
+  filterOptions.classList.toggle("is-roll-list", activeMode === "rolls");
+  if (activeMode === "subjects") {
+    filterOptions.replaceChildren(...archive.categories.map(createFilterButton));
+    return;
+  }
+
+  const rollsByYear = new Map([[2026, []], [2025, []], [2024, []]]);
+  [...archive.rolls]
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .forEach((roll) => rollsByYear.get(yearForRoll(roll)).push({
+      id: roll.id,
+      label: roll.name,
+      emoji: rollEmojis[roll.id] || "🎞️",
+    }));
+
+  const rows = [...rollsByYear].map(([year, rolls]) => {
+    const row = document.createElement("div");
+    row.className = "filter-year-row";
+
+    const yearBadge = document.createElement("span");
+    yearBadge.className = "filter-year-badge";
+    yearBadge.textContent = year;
+
+    row.append(yearBadge, ...rolls.map(createFilterButton));
+    return row;
+  });
+  filterOptions.replaceChildren(...rows);
 }
 
 function selectFilter(filter, shouldUpdateUrl = false) {
   galleryVersion += 1;
   activeFilter = filter;
+  setActiveMode(activeMode);
+  updatePageTitle();
   photos = currentPhotos();
   nextPhoto = 0;
   loadedPhotos = [];
@@ -635,7 +729,7 @@ document.addEventListener("keydown", (event) => {
 
 if (!window.ROLLS_ARCHIVE) {
   sentinel.hidden = true;
-  gallery.textContent = "The archive data could not be loaded.";
+  gallery.textContent = "Údaje archívu sa nepodarilo načítať.";
 } else {
   archive = {
     ...window.ROLLS_ARCHIVE,
@@ -645,7 +739,7 @@ if (!window.ROLLS_ARCHIVE) {
   const rollCount = archive.rolls.reduce((total, roll) => total + (roll.rollCount || 1), 0);
   document.querySelector("#roll-count").textContent = `(${rollCount})`;
   document.querySelector("#shutter-count").textContent = `(${rollCount * shuttersPerRoll})`;
-  document.querySelector("#film-cost").textContent = `€${((filmPrice + developmentPrice) * rollCount).toFixed(2)}`;
+  document.querySelector("#film-cost").textContent = `€${(averageCostPerRoll * rollCount).toFixed(2)}`;
   const selection = selectionFromUrl();
   setActiveMode(selection.mode);
   renderFilterOptions();

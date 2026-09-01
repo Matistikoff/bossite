@@ -2,41 +2,49 @@ window.ROLLS_ARCHIVE = {
   "categories": [
     {
       "id": "portraits",
-      "label": "Portraits"
+      "label": "Portréty",
+      "emoji": "👤"
     },
     {
       "id": "landscapes",
-      "label": "Landscapes"
+      "label": "Krajiny",
+      "emoji": "🏞️"
     },
     {
       "id": "macro",
-      "label": "Macro / details"
+      "label": "Makro / detaily",
+      "emoji": "🔍"
     },
     {
       "id": "street",
-      "label": "Street"
+      "label": "Ulica",
+      "emoji": "🚶"
     },
     {
       "id": "architecture",
-      "label": "Architecture"
+      "label": "Architektúra",
+      "emoji": "🏛️"
     },
     {
       "id": "nature",
-      "label": "Nature"
+      "label": "Príroda",
+      "emoji": "🌿"
     },
     {
       "id": "still-life",
-      "label": "Still life"
+      "label": "Zátišie",
+      "emoji": "🍎"
     },
     {
       "id": "abstract",
-      "label": "Abstract"
+      "label": "Abstrakt",
+      "emoji": "🎨"
     }
   ],
   "rolls": [
     {
       "id": "1_The_First",
-      "name": "The First",
+      "name": "Prvý",
       "sortOrder": 1,
       "rollCount": 1,
       "photos": [
@@ -297,7 +305,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "2_Home",
-      "name": "Home",
+      "name": "Domov",
       "sortOrder": 2,
       "rollCount": 1,
       "photos": [
@@ -552,7 +560,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "3_Filip_Fodbal",
-      "name": "Filip Fodbal",
+      "name": "Filip Futbal",
       "sortOrder": 3,
       "rollCount": 1,
       "photos": [
@@ -743,7 +751,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "4_BA_Saska_Miska",
-      "name": "BA Saska Miska",
+      "name": "BA Saška Miška",
       "sortOrder": 4,
       "rollCount": 1,
       "photos": [
@@ -953,7 +961,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "5_BW_BA",
-      "name": "BW BA",
+      "name": "ČB BA",
       "sortOrder": 5,
       "rollCount": 1,
       "photos": [
@@ -1187,7 +1195,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "6_OkoloVianoc24",
-      "name": "OkoloVianoc24",
+      "name": "Okolo Vianoc",
       "sortOrder": 6,
       "rollCount": 1,
       "photos": [
@@ -1457,7 +1465,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "7_Chata24",
-      "name": "Chata24",
+      "name": "Chata",
       "sortOrder": 7,
       "rollCount": 1,
       "photos": [
@@ -1666,7 +1674,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "8_Vianoce24",
-      "name": "Vianoce24",
+      "name": "Vianoce",
       "sortOrder": 8,
       "rollCount": 1,
       "photos": [
@@ -1861,7 +1869,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "9_StefanskyVystup24",
-      "name": "StefanskyVystup24",
+      "name": "Štefanský výstup",
       "sortOrder": 9,
       "rollCount": 1,
       "photos": [
@@ -2119,7 +2127,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "10_OkoloVianoc24",
-      "name": "OkoloVianoc24",
+      "name": "Okolo Vianoc",
       "sortOrder": 10,
       "rollCount": 1,
       "photos": [
@@ -2322,7 +2330,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "11_Macedonsko25",
-      "name": "Macedonsko25",
+      "name": "Macedónsko",
       "sortOrder": 11,
       "rollCount": 1,
       "photos": [
@@ -2584,7 +2592,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "12_Lost",
-      "name": "Lost",
+      "name": "Stratené",
       "sortOrder": 12,
       "rollCount": 1,
       "photos": [
@@ -2637,7 +2645,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "13_Lyziarsky",
-      "name": "Lyziarsky",
+      "name": "Lyžiarsky",
       "sortOrder": 13,
       "rollCount": 1,
       "photos": [
@@ -2888,7 +2896,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "14_KrojeSkate",
-      "name": "KrojeSkate",
+      "name": "Kroje a skejt",
       "sortOrder": 14,
       "rollCount": 1,
       "photos": [
@@ -3171,7 +3179,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "15_Slovinsko25",
-      "name": "Slovinsko25",
+      "name": "Slovinsko",
       "sortOrder": 15,
       "rollCount": 1,
       "photos": [
@@ -3706,7 +3714,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "17_Inzinier",
-      "name": "Inzinier",
+      "name": "Inžinier",
       "sortOrder": 17,
       "rollCount": 1,
       "photos": [
@@ -3977,7 +3985,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "18_LiubovTura_Promocie",
-      "name": "LiubovTura Promocie",
+      "name": "Liubov Túra Promócie",
       "sortOrder": 18,
       "rollCount": 1,
       "photos": [
@@ -4229,7 +4237,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "19_BW2",
-      "name": "BW2",
+      "name": "ČB2",
       "sortOrder": 19,
       "rollCount": 1,
       "photos": [
@@ -4498,7 +4506,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "20...32_Indonezia",
-      "name": "Indonezia",
+      "name": "Indonézia",
       "sortOrder": 20,
       "rollCount": 13,
       "photos": [
@@ -7806,7 +7814,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "33_SlovinskoLiubov",
-      "name": "SlovinskoLiubov",
+      "name": "Slovinsko Liubov",
       "sortOrder": 33,
       "rollCount": 1,
       "photos": [
@@ -8015,7 +8023,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "34_Forsta25",
-      "name": "Forsta25",
+      "name": "Forsta",
       "sortOrder": 34,
       "rollCount": 1,
       "photos": [
@@ -8256,7 +8264,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "35_Godfather",
-      "name": "Godfather",
+      "name": "Krstný otec",
       "sortOrder": 35,
       "rollCount": 1,
       "photos": [
@@ -8368,7 +8376,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "36_LiubovBarla",
-      "name": "LiubovBarla",
+      "name": "Liubov Barla",
       "sortOrder": 36,
       "rollCount": 1,
       "photos": [
@@ -8615,7 +8623,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "37_Prve_Svate_Prijimanie",
-      "name": "Prve Svate Prijimanie",
+      "name": "Prvé sväté prijímanie",
       "sortOrder": 37,
       "rollCount": 1,
       "photos": [
@@ -8854,7 +8862,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "38_LiubovPraha",
-      "name": "LiubovPraha",
+      "name": "Liubov Praha",
       "sortOrder": 38,
       "rollCount": 1,
       "photos": [
@@ -9126,7 +9134,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "39_Budapest",
-      "name": "Budapest",
+      "name": "Budapešť",
       "sortOrder": 39,
       "rollCount": 1,
       "photos": [
@@ -10168,7 +10176,7 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "42_Vienna",
-      "name": "Vienna",
+      "name": "Viedeň",
       "sortOrder": 42,
       "rollCount": 1,
       "photos": [

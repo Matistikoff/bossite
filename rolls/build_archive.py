@@ -24,16 +24,48 @@ LOGICAL_ROLL_COUNTS = {
     "20...32_Indonezia": 13,
     "40...41_Ukrajina": 2,
 }
+ROLL_LABELS = {
+    "1_The_First": "Prvý",
+    "2_Home": "Domov",
+    "3_Filip_Fodbal": "Filip Futbal",
+    "4_BA_Saska_Miska": "BA Saška Miška",
+    "5_BW_BA": "ČB BA",
+    "6_OkoloVianoc24": "Okolo Vianoc",
+    "7_Chata24": "Chata",
+    "8_Vianoce24": "Vianoce",
+    "9_StefanskyVystup24": "Štefanský výstup",
+    "10_OkoloVianoc24": "Okolo Vianoc",
+    "11_Macedonsko25": "Macedónsko",
+    "12_Lost": "Stratené",
+    "13_Lyziarsky": "Lyžiarsky",
+    "14_KrojeSkate": "Kroje a skejt",
+    "15_Slovinsko25": "Slovinsko",
+    "16_Zuberec_BA": "Zuberec BA",
+    "17_Inzinier": "Inžinier",
+    "18_LiubovTura_Promocie": "Liubov Túra Promócie",
+    "19_BW2": "ČB2",
+    "20...32_Indonezia": "Indonézia",
+    "33_SlovinskoLiubov": "Slovinsko Liubov",
+    "34_Forsta25": "Forsta",
+    "35_Godfather": "Krstný otec",
+    "36_LiubovBarla": "Liubov Barla",
+    "37_Prve_Svate_Prijimanie": "Prvé sväté prijímanie",
+    "38_LiubovPraha": "Liubov Praha",
+    "39_Budapest": "Budapešť",
+    "40...41_Ukrajina": "Ukrajina",
+    "40_Pohoda": "Pohoda",
+    "42_Vienna": "Viedeň",
+}
 
 CATEGORIES = [
-    {"id": "portraits", "label": "Portraits"},
-    {"id": "landscapes", "label": "Landscapes"},
-    {"id": "macro", "label": "Macro / details"},
-    {"id": "street", "label": "Street"},
-    {"id": "architecture", "label": "Architecture"},
-    {"id": "nature", "label": "Nature"},
-    {"id": "still-life", "label": "Still life"},
-    {"id": "abstract", "label": "Abstract"},
+    {"id": "portraits", "label": "Portréty", "emoji": "👤"},
+    {"id": "landscapes", "label": "Krajiny", "emoji": "🏞️"},
+    {"id": "macro", "label": "Makro / detaily", "emoji": "🔍"},
+    {"id": "street", "label": "Ulica", "emoji": "🚶"},
+    {"id": "architecture", "label": "Architektúra", "emoji": "🏛️"},
+    {"id": "nature", "label": "Príroda", "emoji": "🌿"},
+    {"id": "still-life", "label": "Zátišie", "emoji": "🍎"},
+    {"id": "abstract", "label": "Abstrakt", "emoji": "🎨"},
 ]
 
 
@@ -47,6 +79,8 @@ def roll_number(folder_name: str) -> int:
 
 
 def roll_label(folder_name: str) -> str:
+    if folder_name in ROLL_LABELS:
+        return ROLL_LABELS[folder_name]
     without_prefix = re.sub(r"^\d+(?:\.\.\.\d+)?_?", "", folder_name)
     return without_prefix.replace("_", " ").strip() or folder_name
 

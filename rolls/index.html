@@ -1,73 +1,73 @@
 <!doctype html>
-<html lang="en">
+<html lang="sk">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#10100e" />
-    <title>Rolls — mito.boss</title>
+    <title>Rollky — mito.boss</title>
+    <link rel="preload" as="image" href="../assets/web-images/20...32_Indonezia/indonézia/Canail Film Lab_73034(2)_fav2.webp" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="./rolls.css" />
     <script src="./data.js" defer></script>
     <script src="./rolls.js" defer></script>
   </head>
   <body>
-    <header class="site-header">
-      <a class="home-link" href="../index.html">mito.boss</a>
-      <div class="header-controls">
-        <label class="density-control" for="density">
-          <span>density</span>
-          <input id="density" type="range" min="0" max="100" value="50" />
-        </label>
-        <div class="archive-stats" aria-label="Archive statistics">
-          <p>rolls <span id="roll-count"></span></p>
-          <p>shutters <span id="shutter-count"></span></p>
-          <p>cost <span id="film-cost"></span></p>
-        </div>
-      </div>
-    </header>
-
     <main>
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">a little archive</p>
-        <h1 id="page-title">Mito.Rolls</h1>
-        <p class="lede">Small moments, kept on film-ish pixels. Browse the newest rolls, or find a subject.</p>
-        <div class="archive-controls" aria-label="Gallery filters">
-          <div class="browse-modes" role="tablist" aria-label="Browse photos by">
-            <button class="mode-button is-active" type="button" role="tab" aria-selected="true" data-mode="rolls">New / rolls</button>
-            <button class="mode-button" type="button" role="tab" aria-selected="false" data-mode="subjects">Subjects</button>
+      <section class="intro intro--photo" aria-labelledby="page-title">
+        <header class="site-header">
+          <a class="home-link" href="../index.html">mito.boss</a>
+          <div class="header-controls">
+            <label class="density-control" for="density">
+              <span>hustota fotiek</span>
+              <input id="density" type="range" min="0" max="100" value="50" />
+            </label>
+            <div class="archive-stats" aria-label="Štatistiky archívu">
+              <p>rollky <span id="roll-count"></span></p>
+              <p>zábery <span id="shutter-count"></span></p>
+              <p>náklady <span id="film-cost"></span></p>
+            </div>
           </div>
-          <div id="filter-options" class="filter-options" aria-label="Available filters"></div>
+        </header>
+        <p id="roll-year" class="eyebrow">2026</p>
+        <h1 id="page-title">Mito.Rolls</h1>
+        <p class="lede">Malé momenty zachytené na filmových pixeloch. Prezri si najnovšie rollky alebo vyber kategóriu.</p>
+        <div class="archive-controls" aria-label="Filtre galérie">
+          <div class="browse-modes" role="tablist" aria-label="Prehliadať fotografie podľa">
+            <button class="mode-button is-active" type="button" role="tab" aria-selected="true" data-mode="rolls">Nové / rollky</button>
+            <button class="mode-button" type="button" role="tab" aria-selected="false" data-mode="subjects">Kategórie</button>
+          </div>
+          <div id="filter-options" class="filter-options" aria-label="Dostupné filtre"></div>
         </div>
       </section>
 
-      <section id="gallery" class="gallery" aria-label="Photo gallery"></section>
+      <section id="gallery" class="gallery" aria-label="Galéria fotografií"></section>
       <div id="gallery-sentinel" class="gallery-sentinel" aria-live="polite">
-        Loading more photos…
+        Načítavajú sa ďalšie fotografie…
       </div>
     </main>
 
-    <dialog id="lightbox" class="lightbox" aria-label="Photo viewer" tabindex="-1">
-      <button class="lightbox-close" type="button" aria-label="Close photo viewer" title="Close photo viewer (Esc)">×</button>
-      <button class="lightbox-frame-toggle" type="button" aria-label="Hide photo frame" aria-pressed="true" title="Hide photo frame (B)">
+    <dialog id="lightbox" class="lightbox" aria-label="Prehliadač fotografií" tabindex="-1">
+      <button class="lightbox-close" type="button" aria-label="Zavrieť prehliadač fotografií" title="Zavrieť prehliadač fotografií (Esc)">×</button>
+      <button class="lightbox-frame-toggle" type="button" aria-label="Skryť rám fotografie" aria-pressed="true" title="Skryť rám fotografie (B)">
         <span class="lightbox-frame-icon" aria-hidden="true"></span>
       </button>
-      <button class="lightbox-rotate" type="button" aria-label="Rotate photo clockwise" title="Rotate clockwise (R)">↻</button>
-      <button class="lightbox-help" type="button" aria-label="Show photo viewer shortcuts" title="Photo viewer shortcuts" aria-controls="lightbox-shortcuts" aria-expanded="false">?</button>
-      <section id="lightbox-shortcuts" class="lightbox-shortcuts" aria-label="Photo viewer shortcuts" hidden>
-        <p>Photo viewer shortcuts</p>
+      <button class="lightbox-rotate" type="button" aria-label="Otočiť fotografiu doprava" title="Otočiť fotografiu doprava (R)">↻</button>
+      <button class="lightbox-help" type="button" aria-label="Zobraziť klávesové skratky prehliadača" title="Klávesové skratky prehliadača" aria-controls="lightbox-shortcuts" aria-expanded="false">?</button>
+      <section id="lightbox-shortcuts" class="lightbox-shortcuts" aria-label="Klávesové skratky prehliadača" hidden>
+        <p>Klávesové skratky prehliadača</p>
         <ul>
-          <li><kbd>F</kbd> Fullscreen</li>
-          <li><kbd>G</kbd> Last image · <kbd>G</kbd><kbd>G</kbd> First image</li>
-          <li><kbd>+</kbd> Zoom in · <kbd>−</kbd> Zoom out</li>
-          <li><kbd>0</kbd> Reset / fit photo</li>
-          <li>Click the photo to zoom in or reset</li>
+          <li><kbd>F</kbd> Celá obrazovka</li>
+          <li><kbd>G</kbd> Posledná fotografia · <kbd>G</kbd><kbd>G</kbd> Prvá fotografia</li>
+          <li><kbd>+</kbd> Priblížiť · <kbd>−</kbd> Oddialiť</li>
+          <li><kbd>0</kbd> Obnoviť / prispôsobiť fotografiu</li>
+          <li>Kliknutím na fotografiu ju priblížite alebo obnovíte</li>
         </ul>
       </section>
-      <button class="lightbox-nav lightbox-previous" type="button" aria-label="Previous photo" title="Previous photo (←, H, or J)">←</button>
+      <button class="lightbox-nav lightbox-previous" type="button" aria-label="Predchádzajúca fotografia" title="Predchádzajúca fotografia (←, H alebo J)">←</button>
       <div class="lightbox-viewport">
         <img id="lightbox-image" alt="" draggable="false" />
       </div>
-      <button class="lightbox-reset" type="button" aria-label="Reset zoom" title="Fit photo to screen (0)" hidden>fit</button>
-      <button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo" title="Next photo (→, K, or L)">→</button>
+      <button class="lightbox-reset" type="button" aria-label="Obnoviť priblíženie" title="Prispôsobiť fotografiu obrazovke (0)" hidden>prispôsobiť</button>
+      <button class="lightbox-nav lightbox-next" type="button" aria-label="Nasledujúca fotografia" title="Nasledujúca fotografia (→, K alebo L)">→</button>
     </dialog>
   </body>
 </html>
