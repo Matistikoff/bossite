@@ -2343,6 +2343,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Macedónsko",
       "sortOrder": 11,
       "rollCount": 1,
+      "hero": "nasadat",
       "photos": [
         {
           "file": "000008",
@@ -2605,6 +2606,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Stratené",
       "sortOrder": 12,
       "rollCount": 1,
+      "hero": "pallete",
       "photos": [
         {
           "file": "modlitba",
@@ -2658,6 +2660,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Lyžiarsky",
       "sortOrder": 13,
       "rollCount": 1,
+      "hero": "000008_naljaty",
       "photos": [
         {
           "file": "000003",
@@ -2907,6 +2910,7 @@ window.ROLLS_ARCHIVE = {
     {
       "id": "14_KrojeSkate",
       "name": "Kroje a skejt",
+      "hero": "000040_ready",
       "sortOrder": 14,
       "rollCount": 1,
       "photos": [
@@ -3192,6 +3196,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Slovinsko",
       "sortOrder": 15,
       "rollCount": 1,
+      "hero": "macroPivo",
       "photos": [
         {
           "file": "2 stlpky aka kampo s lampou",
@@ -3462,6 +3467,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Zuberec BA",
       "sortOrder": 16,
       "rollCount": 1,
+      "hero": "vlek",
       "photos": [
         {
           "file": "000007",
@@ -3727,6 +3733,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Inžinier",
       "sortOrder": 17,
       "rollCount": 1,
+      "hero": "000022_smiesky",
       "photos": [
         {
           "file": "000003",
@@ -3998,6 +4005,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Liubov Túra Promócie",
       "sortOrder": 18,
       "rollCount": 1,
+      "hero": "000017_fav",
       "photos": [
         {
           "file": "000008",
@@ -4250,6 +4258,7 @@ window.ROLLS_ARCHIVE = {
       "name": "ČB2",
       "sortOrder": 19,
       "rollCount": 1,
+      "hero": "contrast",
       "photos": [
         {
           "file": "444",
@@ -4519,6 +4528,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Indonézia",
       "sortOrder": 20,
       "rollCount": 13,
+      "hero": "indonézia/0000092742_taxitaxi",
       "photos": [
         {
           "file": "indonézia/0780",
@@ -7827,6 +7837,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Slovinsko Liubov",
       "sortOrder": 33,
       "rollCount": 1,
+      "hero": "20260129_104425233_iOS_pozers",
       "photos": [
         {
           "file": "20260129_104425169_iOS",
@@ -8033,9 +8044,10 @@ window.ROLLS_ARCHIVE = {
     },
     {
       "id": "34_Forsta25",
-      "name": "Forsta",
+      "name": "Foršta",
       "sortOrder": 34,
       "rollCount": 1,
+      "hero": "sideView",
       "photos": [
         {
           "file": "20260308_142559798_iOS",
@@ -8277,6 +8289,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Krstný otec",
       "sortOrder": 35,
       "rollCount": 1,
+      "hero": "20260831_144516780_iOS_hehe",
       "photos": [
         {
           "file": "20260831_144516780_iOS_hehe",
@@ -8389,6 +8402,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Liubov Barla",
       "sortOrder": 36,
       "rollCount": 1,
+      "hero": "accidentallyNice",
       "photos": [
         {
           "file": "000003",
@@ -8636,6 +8650,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Prvé sväté prijímanie",
       "sortOrder": 37,
       "rollCount": 1,
+      "hero": "najdiBetara",
       "photos": [
         {
           "file": "20260521_173339630_iOS",
@@ -8875,6 +8890,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Liubov Praha",
       "sortOrder": 38,
       "rollCount": 1,
+      "hero": "000026_kvetinky",
       "photos": [
         {
           "file": "000002",
@@ -9147,6 +9163,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Budapešť",
       "sortOrder": 39,
       "rollCount": 1,
+      "hero": "000016_zabafka",
       "photos": [
         {
           "file": "000008",
@@ -9380,6 +9397,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Ukrajina",
       "sortOrder": 40,
       "rollCount": 2,
+      "hero": "FOTOsk003640/kontrolaListkov",
       "photos": [
         {
           "file": "FOTOsk003640/000007",
@@ -9918,6 +9936,7 @@ window.ROLLS_ARCHIVE = {
       "name": "Pohoda",
       "sortOrder": 40,
       "rollCount": 1,
+      "hero": "20260715_184648184_iOS_akeToKoleso",
       "photos": [
         {
           "file": "20260715_184645928_iOS_sPrstomLepsia",
@@ -10188,6 +10207,7 @@ window.ROLLS_ARCHIVE = {
       "id": "42_Vienna",
       "name": "Viedeň",
       "sortOrder": 42,
+      "hero": "000036_ferrari",
       "rollCount": 1,
       "photos": [
         {

@@ -1,8 +1,23 @@
 # Photo archive
 
-`data.js` is the single source for gallery labels and filters. Every photo has one
-roll (because it lives inside that roll's image folder), and can have as many subject
-categories as you want.
+`data.js` is the single source for gallery labels, filters, and hero photos. Every
+photo has one roll (because it lives inside that roll's image folder), and can have
+as many subject categories as you want.
+
+## Change a roll hero
+
+Edit that roll in `data.js` and set its `hero` value to a photo's `file` value
+(without `.webp`). This does not require the original images or the build script.
+
+```json
+{
+  "id": "11_Macedonsko25",
+  "name": "Macedónsko",
+  "sortOrder": 11,
+  "rollCount": 1,
+  "hero": "predZoo"
+}
+```
 
 For a new roll:
 
@@ -10,8 +25,8 @@ For a new roll:
 2. Run `python rolls/build_archive.py` from the project root. This creates or
    refreshes 3200 px WebP gallery images and smaller WebP thumbnails, then
    rewrites `data.js` from the source folders.
-3. Optionally assign subject category IDs to photos in `data.js`. The build script
-   preserves existing assignments by roll ID and filename. Newly discovered photos
+3. Optionally assign subject category IDs or a `hero` value in `data.js`. The build
+   script preserves those settings by roll ID and filename. Newly discovered photos
    start uncategorized and remain visible in the roll views.
 
 Example:
@@ -38,7 +53,8 @@ and web-image folders. They remain part of their top-level roll.
 
 High-resolution sources remain local under `assets/images/<number>_*` and are
 excluded from Git and deployment. The public lightbox uses the generated files
-under `assets/web-images/`.
+under `assets/web-images/`. The builder refuses to run if any roll already in
+`data.js` is missing its original source folder, so it cannot erase a partial gallery.
 
 `rollCount` records how many physical film rolls are represented by a gallery
 group. The Indonesia group represents 10 rolls and the Ukraine group represents 2.

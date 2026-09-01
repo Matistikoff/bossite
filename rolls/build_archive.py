@@ -56,19 +56,6 @@ ROLL_LABELS = {
     "40_Pohoda": "Pohoda",
     "42_Vienna": "Viedeň",
 }
-ROLL_HEROES = {
-    "1_The_First": "skodovka",
-    "2_Home": "20241109_225821551_iOS_nasiADom",
-    "3_Filip_Fodbal": "20241113_221349995_iOS_akcia",
-    "4_BA_Saska_Miska": "20241123_204903783_iOS_the_portrait",
-    "5_BW_BA": "20241210_114901079_iOS_ufoPetr",
-    "6_OkoloVianoc24": "karlovkaFromHell",
-    "7_Chata24": "chata",
-    "8_Vianoce24": "pripravy",
-    "9_StefanskyVystup24": "000038_dobryVecer",
-    "10_OkoloVianoc24": "peknyMilotin",
-}
-
 CATEGORIES = [
     {"id": "portraits", "label": "Portréty", "emoji": "👤"},
     {"id": "landscapes", "label": "Krajiny", "emoji": "🏞️"},
@@ -176,10 +163,12 @@ def prune_generated_assets(root: Path, expected: set[Path]) -> int:
     return removed
 
 
-def load_existing_categories() -> dict[tuple[str, str], list[str]]:
-    """Read category assignments from the current generated archive."""
+def load_existing_metadata() -> tuple[
+    dict[tuple[str, str], list[str]], dict[str, str], set[str]
+]:
+    """Read editable category and hero settings from the current archive."""
     if not DATA_FILE.exists():
-        return {}
+        return {}, {}, set()
 
     contents = DATA_FILE.read_text(encoding="utf-8").strip()
     if not contents.startswith(DATA_PREFIX) or not contents.endswith(";"):
@@ -195,21 +184,27 @@ def load_existing_categories() -> dict[tuple[str, str], list[str]]:
         ) from error
 
     categories: dict[tuple[str, str], list[str]] = {}
+    heroes: dict[str, str] = {}
+    roll_ids: set[str] = set()
     for roll in archive.get("rolls", []):
         roll_id = roll.get("id")
         if not isinstance(roll_id, str):
             continue
+        roll_ids.add(roll_id)
+        hero = roll.get("hero")
+        if isinstance(hero, str):
+            heroes[roll_id] = hero
         for photo in roll.get("photos", []):
             file = photo.get("file")
             photo_categories = photo.get("categories", [])
             if isinstance(file, str) and isinstance(photo_categories, list):
                 categories[(roll_id, file)] = photo_categories.copy()
 
-    return categories
+    return categories, heroes, roll_ids
 
 
 def main() -> None:
-    existing_categories = load_existing_categories()
+    existing_categories, existing_heroes, existing_roll_ids = load_existing_metadata()
     roll_dirs = sorted(
         (
             path
@@ -220,6 +215,20 @@ def main() -> None:
         ),
         key=lambda path: (roll_number(path.name), natural_key(path.name)),
     )
+    if not roll_dirs:
+        raise ValueError(
+            "No original roll folders were found in assets/images. "
+            "Refusing to overwrite the existing gallery."
+        )
+
+    source_roll_ids = {directory.name for directory in roll_dirs}
+    missing_roll_ids = existing_roll_ids - source_roll_ids
+    if missing_roll_ids:
+        raise ValueError(
+            "Some original roll folders are missing: "
+            f"{', '.join(sorted(missing_roll_ids))}. "
+            "Refusing to overwrite the existing gallery."
+        )
 
     rolls = []
     photo_count = 0
@@ -277,8 +286,8 @@ def main() -> None:
             "rollCount": LOGICAL_ROLL_COUNTS.get(roll_dir.name, 1),
             "photos": photos,
         }
-        if roll_dir.name in ROLL_HEROES:
-            hero = ROLL_HEROES[roll_dir.name]
+        hero = existing_heroes.get(roll_dir.name)
+        if hero:
             if hero not in {photo["file"] for photo in photos}:
                 raise ValueError(
                     f"Hero photo {hero!r} does not exist in roll {roll_dir.name!r}."
