@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Visited Places Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tourney:wght@100&display=swap" rel="stylesheet">
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+#chartdiv {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+}
+#chartdiv button,
+#chartdiv input,
+#chartdiv select,
+#chartdiv a,
+#chartdiv label,
+#chartdiv [role="button"],
+#chartdiv [role="slider"],
+#chartdiv svg text { display: none !important; }
+.home-link {
+  position: fixed;
+  top: max(24px, env(safe-area-inset-top));
+  left: max(28px, env(safe-area-inset-left));
+  z-index: 2;
+  color: #fff;
+  font: 100 clamp(28px, 3vw, 42px)/1 "Tourney", sans-serif;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+.home-link:hover { opacity: 0.7; }
+.home-link:focus-visible { outline: 1px solid #fff; outline-offset: 8px; }
+.countries-panel {
+  position: fixed;
+  z-index: 1;
+  top: 100px;
+  right: 28px;
+  bottom: 32px;
+  width: clamp(190px, 20vw, 270px);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  border-left: 1px solid #ffffff26;
+  background: #171717c9;
+  backdrop-filter: blur(12px);
+}
+.countries-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 18px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffffa6;
+}
+#country-count { white-space: nowrap; font-variant-numeric: tabular-nums; }
+#country-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff40 transparent;
+}
+.country-group ol { margin: 0; padding: 0; list-style: none; }
+.country-group + .country-group { margin-top: 24px; }
+.continent-heading {
+  margin: 0 0 10px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff73;
+}
+#country-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #ffffffa6;
+  animation: country-enter 350ms ease-out both;
+}
+#country-list li.is-current { color: #fff; }
+.country-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 3px 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.country-button:enabled:hover { color: #fff; background: #ffffff0d; }
+.country-button:disabled { cursor: default; }
+.country-button:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+#country-list li.is-selected { color: #fff; }
+.is-selected .country-button { text-decoration: underline; text-underline-offset: 4px; }
+.country-flag { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 17px; line-height: 1; flex-shrink: 0; }
+@keyframes country-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 600px) {
+  .home-link { top: max(20px, env(safe-area-inset-top)); left: 20px; }
+  .countries-panel {
+    top: auto;
+    right: 16px;
+    left: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 28dvh;
+    padding: 14px 18px;
+    border-left: 0;
+    border-top: 1px solid #ffffff26;
+  }
+  .countries-heading { margin-bottom: 10px; }
+  .country-group ol { display: flex; flex-wrap: wrap; gap: 2px 18px; }
+  .country-group + .country-group { margin-top: 16px; }
+  #country-list li { font-size: 12px; gap: 7px; padding: 4px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #country-list li { animation: none; }
+}
+</style>
+</head>
+<body>
+<div id="chartdiv"></div>
+<a class="home-link" href="../" target="_top" aria-label="mito.boss home">mito.boss</a>
+<aside class="countries-panel" aria-labelledby="countries-heading">
+  <h1 class="countries-heading" id="countries-heading">Countries <span id="country-count" title="World total: 193 UN members and 2 observer states">0 / 195</span></h1>
+  <div id="country-list" aria-label="Countries revealed on the globe"></div>
+</aside>
+<script>
+var visitedplaces_config = {
+  "map": "world",
+  "projection": "geoOrthographic",
+  "theme": "dark-green",
+  "water": 1,
+  "graticule": 0,
+  "names": 0,
+  "duration": 200,
+  "placeduration": 30,
+  "slider": 0,
+  "autoplay": 1,
+  "autozoom": "step",
+  "autostep": 0,
+  "pie": 0,
+  "home": "SK",
+  "data": [
+    {
+      "places": [
+        "SK"
+      ],
+      "text": "My Home",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": 19.5,
+          "latitude": 48.7
+        },
+        "rotationX": -19.5,
+        "rotationY": -48.7
+      },
+      "colors": {
+        "SK": "daaa44"
+      }
+    },
+    {
+      "places": [
+        "PL"
+      ],
+      "text": "Poland",
+      "position": {
+        "zoomLevel": 5.5,
+        "geoPoint": {
+          "longitude": 19.1,
+          "latitude": 52.1
+        },
+        "rotationX": -19.1,
+        "rotationY": -52.1
+      },
+      "colors": {
+        "PL": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "CZ"
+      ],
+      "text": "Czechia",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": 15.5,
+          "latitude": 49.8
+        },
+        "rotationX": -15.5,
+        "rotationY": -49.8
+      },
+      "colors": {
+        "CZ": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "AT"
+      ],
+      "text": "Austria",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": 14.1,
+          "latitude": 47.6
+        },
+        "rotationX": -14.1,
+        "rotationY": -47.6
+      },
+      "colors": {
+        "AT": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "UA"
+      ],
+      "text": "Ukraine",
+      "position": {
+        "zoomLevel": 4,
+        "geoPoint": {
+          "longitude": 31.2,
+          "latitude": 48.4
+        },
+        "rotationX": -31.2,
+        "rotationY": -48.4
+      },
+      "colors": {
+        "UA": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "HU"
+      ],
+      "text": "Hungary",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": 19.5,
+          "latitude": 47.2
+        },
+        "rotationX": -19.5,
+        "rotationY": -47.2
+      },
+      "colors": {
+        "HU": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "HR"
+      ],
+      "text": "Croatia",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": 16.4,
+          "latitude": 45.1
+        },
+        "rotationX": -16.4,
+        "rotationY": -45.1
+      },
+      "colors": {
+        "HR": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "SI"
+      ],
+      "text": "Slovenia",
+      "position": {
+        "zoomLevel": 9,
+        "geoPoint": {
+          "longitude": 14.8,
+          "latitude": 46.1
+        },
+        "rotationX": -14.8,
+        "rotationY": -46.1
+      }
+    },
+    {
+      "places": [
+        "RS"
+      ],
+      "text": "Serbia",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": 20.8,
+          "latitude": 44
+        },
+        "rotationX": -20.8,
+        "rotationY": -44
+      },
+      "colors": {
+        "RS": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "ME"
+      ],
+      "text": "Montenegro",
+      "position": {
+        "zoomLevel": 10,
+        "geoPoint": {
+          "longitude": 19.3,
+          "latitude": 42.7
+        },
+        "rotationX": -19.3,
+        "rotationY": -42.7
+      },
+      "colors": {
+        "ME": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "AL"
+      ],
+      "text": "Albania",
+      "position": {
+        "zoomLevel": 9,
+        "geoPoint": {
+          "longitude": 20,
+          "latitude": 41.2
+        },
+        "rotationX": -20,
+        "rotationY": -41.2
+      },
+      "colors": {
+        "AL": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "BA"
+      ],
+      "text": "Bosnia and Herzegovina",
+      "position": {
+        "zoomLevel": 8,
+        "geoPoint": {
+          "longitude": 17.8,
+          "latitude": 44.2
+        },
+        "rotationX": -17.8,
+        "rotationY": -44.2
+      },
+      "colors": {
+        "BA": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "XK"
+      ],
+      "text": "Kosovo",
+      "position": {
+        "zoomLevel": 12,
+        "geoPoint": {
+          "longitude": 20.9,
+          "latitude": 42.6
+        },
+        "rotationX": -20.9,
+        "rotationY": -42.6
+      },
+      "colors": {
+        "XK": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "MK"
+      ],
+      "text": "North Macedonia",
+      "position": {
+        "zoomLevel": 10,
+        "geoPoint": {
+          "longitude": 21.7,
+          "latitude": 41.6
+        },
+        "rotationX": -21.7,
+        "rotationY": -41.6
+      },
+      "colors": {
+        "MK": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "GR"
+      ],
+      "text": "Greece",
+      "position": {
+        "zoomLevel": 5,
+        "geoPoint": {
+          "longitude": 23.7,
+          "latitude": 38.5
+        },
+        "rotationX": -23.7,
+        "rotationY": -38.5
+      },
+      "colors": {
+        "GR": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "IE"
+      ],
+      "text": "Ireland",
+      "position": {
+        "zoomLevel": 7,
+        "geoPoint": {
+          "longitude": -8,
+          "latitude": 53.3
+        },
+        "rotationX": 8,
+        "rotationY": -53.3
+      },
+      "colors": {
+        "IE": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "DE"
+      ],
+      "text": "Germany",
+      "position": {
+        "zoomLevel": 5,
+        "geoPoint": {
+          "longitude": 10.4,
+          "latitude": 51.2
+        },
+        "rotationX": -10.4,
+        "rotationY": -51.2
+      },
+      "colors": {
+        "DE": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "IT"
+      ],
+      "text": "Italy",
+      "position": {
+        "zoomLevel": 4.5,
+        "geoPoint": {
+          "longitude": 12.6,
+          "latitude": 42.7
+        },
+        "rotationX": -12.6,
+        "rotationY": -42.7
+      },
+      "colors": {
+        "IT": "aaba42"
+      }
+    },
+    {
+      "places": [
+        "AE"
+      ],
+      "text": "United Arab Emirates",
+      "position": {
+        "zoomLevel": 8,
+        "geoPoint": {
+          "longitude": 54,
+          "latitude": 24.3
+        },
+        "rotationX": -54,
+        "rotationY": -24.3
+      }
+    },
+    {
+      "places": [
+        "MY"
+      ],
+      "text": "Malaysia",
+      "position": {
+        "zoomLevel": 4,
+        "geoPoint": {
+          "longitude": 109,
+          "latitude": 4
+        },
+        "rotationX": -109,
+        "rotationY": -4
+      }
+    },
+    {
+      "places": [
+        "SG"
+      ],
+      "text": "Singapore",
+      "position": {
+        "zoomLevel": 14,
+        "geoPoint": {
+          "longitude": 103.82,
+          "latitude": 1.35
+        },
+        "rotationX": -103.82,
+        "rotationY": -1.35
+      }
+    },
+    {
+      "places": [
+        "ID"
+      ],
+      "text": "Indonesia",
+      "position": {
+        "zoomLevel": 3,
+        "geoPoint": {
+          "longitude": 118,
+          "latitude": -2.5
+        },
+        "rotationX": -118,
+        "rotationY": 2.5
+      }
+    },
+    {
+      "places": [
+        "US"
+      ],
+      "text": "United States",
+      "position": {
+        "zoomLevel": 2.5,
+        "geoPoint": {
+          "longitude": -98.5,
+          "latitude": 39.8
+        },
+        "rotationX": 98.5,
+        "rotationY": -39.8
+      }
+    }
+  ]
+};
+// Use one consistent highlight for every visited country, including home.
+visitedplaces_config.data.forEach(function (step) {
+  step.color = "ffffff";
+  step.colors = {};
+  step.places.forEach(function (id) { step.colors[id] = "ffffff"; });
+});
+</script>
+<script>
+(function () {
+  // The embed loads amCharts asynchronously. Its built-in zoom/rotation
+  // animations can use durations independent of visitedplaces_config.
+  var attempts = 0;
+  function adjustMapAnimationSpeed() {
+    if (!window.am5 || !window.am5.Entity) return false;
+    var prototype = window.am5.Entity.prototype;
+    var originalAnimate = prototype.animate;
+    if (typeof originalAnimate !== "function") return false;
+    prototype.animate = function (options) {
+      var root = this.root;
+      // Run both the tour and the final spin at half their previous speed.
+      var continuousRotation = options &&
+        /^rotation[XYZ]$/.test(options.key) && options.loops === Infinity;
+      if (root && root.dom && root.dom.id === "chartdiv" && options) {
+        options = Object.assign({}, options);
+        var viewer = window.VP;
+        var step = viewer && viewer.data[viewer.step];
+        var longCameraMove = viewer && this === viewer.chart && step &&
+          step.continentTransition && /^(rotation[XYZ]|zoomLevel|translate[XY])$/.test(options.key);
+        var speed = continuousRotation ? 0.5 : (longCameraMove ? 1.6 / 3 : 1.6);
+        if (typeof options.duration === "number") options.duration /= speed;
+        if (typeof options.delay === "number") options.delay /= continuousRotation ? 0.5 : 1.6;
+      }
+      return originalAnimate.call(this, options);
+    };
+    return true;
+  }
+  if (!adjustMapAnimationSpeed()) {
+    var timer = setInterval(function () {
+      if (adjustMapAnimationSpeed() || ++attempts >= 3000) clearInterval(timer);
+    }, 10);
+  }
+})();
+</script>
+<script src="https://visitedplaces.com/embed.js"></script>
+<script>
+(function () {
+  var attachedRoots = new WeakSet();
+  var styledViewers = new WeakSet();
+  var preparedViewers = new WeakSet();
+  var attempts = 0;
+  var lastListStep = null;
+  var lastNavigationEnabled = null;
+  var listViewer = null;
+  var countryList = document.getElementById("country-list");
+  var countryCount = document.getElementById("country-count");
+  var countryNames = new Intl.DisplayNames(["en"], { type: "region" });
+
+  var countryRows = new Map();
+  var continentGroups = new Map();
+  var selectedCountry = null;
+  var continentFallback = {
+    SK: "Europe", PL: "Europe", CZ: "Europe", AT: "Europe", UA: "Europe",
+    HU: "Europe", HR: "Europe", SI: "Europe", RS: "Europe", ME: "Europe",
+    AL: "Europe", BA: "Europe", GR: "Europe", IE: "Europe", DE: "Europe",
+    XK: "Europe", MK: "Europe", IT: "Europe", ID: "Asia", MY: "Asia",
+    SG: "Asia", AE: "Asia", US: "North America"
+  };
+
+  function countryFlag(id) {
+    return String.fromCodePoint.apply(null, Array.from(id.toUpperCase(), function (letter) {
+      return 0x1f1e6 + letter.charCodeAt(0) - 65;
+    }));
+  }
+
+  function canNavigate(viewer) {
+    // The final zoom-out also belongs to the tour; wait for it to settle.
+    return viewer.step >= viewer.data.length && viewer._isPlaying === false;
+  }
+
+  function focusCountry(id) {
+    var viewer = window.VP;
+    if (!viewer || !canNavigate(viewer)) return;
+    var dataItem = viewer.polygonSeries.getDataItemById(id);
+    if (!dataItem) return;
+    // Pause the tour and the final spin so neither can move the selected view.
+    viewer.stop();
+    ["rotationX", "rotationY", "zoomLevel", "translateX", "translateY"].forEach(function (key) {
+      var value = viewer.chart.get(key);
+      if (value !== undefined) viewer.chart.set(key, value);
+    });
+    viewer.polygonSeries.zoomToDataItem(dataItem, true);
+    selectedCountry = id;
+    countryRows.forEach(function (row, countryId) {
+      row.classList.toggle("is-selected", countryId === id);
+      row.firstElementChild.setAttribute("aria-pressed", String(countryId === id));
+    });
+  }
+
+  function updateCountryList() {
+    var viewer = window.VP;
+    if (!viewer || !Number.isFinite(viewer.step)) return;
+    var step = Math.min(viewer.step, viewer.data.length - 1);
+    var navigationEnabled = canNavigate(viewer);
+    if (listViewer === viewer && lastListStep === step &&
+        lastNavigationEnabled === navigationEnabled) return;
+    listViewer = viewer;
+    lastListStep = step;
+    lastNavigationEnabled = navigationEnabled;
+    var revealed = new Set();
+    viewer.data.slice(0, Math.max(0, step + 1)).forEach(function (entry) {
+      entry.places.forEach(function (id) { revealed.add(id); });
+    });
+    countryRows.forEach(function (row, id) {
+      if (!revealed.has(id)) {
+        row.remove();
+        countryRows.delete(id);
+      }
+    });
+    var current = new Set(viewer.data[step] ? viewer.data[step].places : []);
+    revealed.forEach(function (id) {
+      if (countryRows.has(id)) return;
+      var continent = typeof viewer.getContinent === "function" ? viewer.getContinent(id) : "Other";
+      if (continent === "Other") continent = continentFallback[id] || "Other";
+      var group = continentGroups.get(continent);
+      if (!group) {
+        var section = document.createElement("section");
+        section.className = "country-group";
+        var heading = document.createElement("h2");
+        heading.className = "continent-heading";
+        heading.textContent = continent;
+        var list = document.createElement("ol");
+        section.append(heading, list);
+        countryList.appendChild(section);
+        group = { section: section, list: list };
+        continentGroups.set(continent, group);
+      }
+      var row = document.createElement("li");
+      row.dataset.country = id;
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "country-button";
+      button.disabled = !navigationEnabled;
+      button.setAttribute("aria-pressed", String(selectedCountry === id));
+      button.setAttribute("aria-label", "Show " + (countryNames.of(id) || id) + " on the globe");
+      button.addEventListener("click", function () { focusCountry(id); });
+      var flag = document.createElement("span");
+      flag.className = "country-flag";
+      flag.setAttribute("aria-hidden", "true");
+      flag.textContent = countryFlag(id);
+      var name = document.createElement("span");
+      name.textContent = countryNames.of(id) || id;
+      button.append(flag, name);
+      row.appendChild(button);
+      group.list.appendChild(row);
+      countryRows.set(id, row);
+    });
+    continentGroups.forEach(function (group, continent) {
+      if (!group.list.children.length) {
+        group.section.remove();
+        continentGroups.delete(continent);
+      }
+    });
+    countryRows.forEach(function (row, id) {
+      row.classList.toggle("is-current", current.has(id));
+      row.classList.toggle("is-selected", selectedCountry === id);
+      row.firstElementChild.disabled = !navigationEnabled;
+      row.firstElementChild.title = navigationEnabled ? "Show on globe" : "Available after the automatic tour";
+    });
+    countryCount.textContent = revealed.size + " / 195";
+    countryList.scrollTop = countryList.scrollHeight;
+  }
+
+  function applyWhiteCountries() {
+    var viewer = window.VP;
+    if (!viewer || styledViewers.has(viewer)) return;
+    var theme = viewer.themes[viewer.themeName];
+    var white = window.am5.color(0xffffff);
+    theme.visited = white;
+    theme.home = white;
+    theme.hovervisited = white;
+    viewer.data.forEach(function (step) {
+      step.color = "ffffff";
+      step.colors = {};
+      step.places.forEach(function (id) { step.colors[id] = "ffffff"; });
+    });
+    viewer.applyTheme(viewer.themeName);
+    styledViewers.add(viewer);
+  }
+
+  function prepareMapExperience() {
+    var viewer = window.VP;
+    if (!viewer || preparedViewers.has(viewer)) return;
+    var chart = viewer.chart;
+    // Give intercontinental camera moves three times as long, and extend
+    // those timeline steps so the next country cannot interrupt the flight.
+    var stepTimes = [0];
+    var totalDuration = 0;
+    var previousContinent = null;
+    viewer.data.forEach(function (entry, index) {
+      var id = entry.places[0];
+      var continent = viewer.getContinent(id);
+      if (continent === "Other") continent = continentFallback[id] || "Other";
+      entry.continentTransition = index > 0 && continent !== previousContinent;
+      previousContinent = continent;
+      var duration = viewer.duration + entry.places.length * viewer.placeDuration +
+        viewer.animationDuration * 0.8;
+      if (entry.continentTransition) duration += viewer.animationDuration * 3;
+      totalDuration += duration;
+      stepTimes.push(totalDuration);
+    });
+    viewer._totalDuration = function () { return totalDuration; };
+    viewer._positionToStep = function (position) {
+      this._stepTimes = stepTimes;
+      if (position >= 1) return this.data.length;
+      var time = Math.max(0, position) * totalDuration;
+      var step = 0;
+      while (step + 1 < this.data.length && time >= stepTimes[step + 1]) step++;
+      return step;
+    };
+    var originalGoHome = chart.goHome;
+    // The embed schedules goHome() during initialization and again after
+    // geodata loads. During the tour, each step already owns the camera.
+    chart.goHome = function () {
+      if (viewer.step < viewer.data.length) return;
+      return originalGoHome.apply(this, arguments);
+    };
+    var originalFitAntimeridian = viewer._fixAntimeridian;
+    viewer._fixAntimeridian = function () {
+      // A world globe already has its first camera position; auto-fitting
+      // all country bounds after loading would zoom it out again.
+      if (viewer.worldMap && viewer.projection === "geoOrthographic" &&
+          viewer.step < viewer.data.length) return true;
+      return originalFitAntimeridian.apply(this, arguments);
+    };
+    var firstPosition = visitedplaces_config.data[0].position;
+    if (viewer.step <= 0 && firstPosition) {
+      chart.setAll({
+        rotationX: firstPosition.rotationX,
+        rotationY: firstPosition.rotationY,
+        zoomLevel: firstPosition.zoomLevel
+      });
+    }
+
+    var tooltip = window.am5.Tooltip.new(viewer.root, {
+      labelText: "{name}",
+      getFillFromSprite: false,
+      autoTextColor: false,
+      getStrokeFromSprite: false,
+      animationDuration: 150
+    });
+    tooltip.label.setAll({
+      fill: window.am5.color(0xffffff),
+      fontSize: 13,
+      paddingTop: 7,
+      paddingBottom: 7,
+      paddingLeft: 10,
+      paddingRight: 10
+    });
+    tooltip.get("background").setAll({
+      fill: window.am5.color(0x171717),
+      fillOpacity: 0.95,
+      stroke: window.am5.color(0xffffff),
+      strokeOpacity: 0.2,
+      cornerRadiusTL: 4,
+      cornerRadiusTR: 4,
+      cornerRadiusBL: 4,
+      cornerRadiusBR: 4
+    });
+    viewer.polygonSeries.mapPolygons.template.setAll({
+      tooltip: tooltip,
+      tooltipText: "{name}",
+      showTooltipOn: "hover"
+    });
+    // Also cover polygons already created before the asynchronous hook ran.
+    viewer.polygonSeries.mapPolygons.each(function (polygon) {
+      polygon.setAll({ tooltip: tooltip, tooltipText: "{name}", showTooltipOn: "hover" });
+    });
+    preparedViewers.add(viewer);
+  }
+
+  function cleanMap(node) {
+    if (!node || (node.isDisposed && node.isDisposed())) return;
+    // Hover tooltips and their labels stay available; persistent UI stays hidden.
+    if (node.isType && node.isType("Tooltip")) return;
+    var uiTypes = ["Label", "Button", "Slider", "Legend", "PieChart"];
+    if (node.isType && uiTypes.some(function (type) { return node.isType(type); })) {
+      if (!node.get("forceHidden")) {
+        node.setAll({ forceHidden: true, visible: false, interactive: false });
+      }
+      return;
+    }
+    if (node.isType && node.isType("MapChart")) {
+      var zoomControl = node.get("zoomControl");
+      if (zoomControl && !zoomControl.get("forceHidden")) {
+        zoomControl.setAll({ forceHidden: true, visible: false });
+      }
+    }
+    if (node.children) node.children.each(cleanMap);
+  }
+
+  function attachCleanup() {
+    if (!window.am5 || !window.am5.registry) return false;
+    prepareMapExperience();
+    applyWhiteCountries();
+    updateCountryList();
+    var found = false;
+    window.am5.registry.rootElements.forEach(function (root) {
+      if (!root.dom || root.dom.id !== "chartdiv") return;
+      found = true;
+      if (root._logo) root._logo.dispose();
+      cleanMap(root.container);
+      cleanMap(root.tooltipContainer);
+      if (!attachedRoots.has(root)) {
+        attachedRoots.add(root);
+        // Keep controls and labels hidden when the embed creates new steps.
+        root.events.on("framestarted", function () {
+          prepareMapExperience();
+          applyWhiteCountries();
+          updateCountryList();
+          cleanMap(root.container);
+          cleanMap(root.tooltipContainer);
+        });
+      }
+    });
+    return found;
+  }
+  if (!attachCleanup()) {
+    var timer = setInterval(function () {
+      if (attachCleanup() || ++attempts >= 600) clearInterval(timer);
+    }, 100);
+  }
+})();
+</script>
+<script src="country-photos.js"></script>
+</body>
+</html>

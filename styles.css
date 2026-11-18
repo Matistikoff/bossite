@@ -28,6 +28,25 @@ h1 {
   animation: blink 0.85s steps(1, end) infinite;
 }
 
+.been-link {
+  position: fixed;
+  left: clamp(1rem, 3vw, 3rem);
+  bottom: clamp(1rem, 3vw, 3rem);
+  width: clamp(7rem, 14vw, 13rem);
+  line-height: 0;
+}
+
+.been-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.been-link:focus-visible {
+  outline: 1px solid #f5ba17;
+  outline-offset: 0.45rem;
+}
+
 @keyframes blink {
   50% {
     opacity: 0;
